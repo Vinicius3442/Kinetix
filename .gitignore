@@ -1,0 +1,9 @@
+# References directory containing PDF documents (Confidential / Internal)
+referencias/
+Referencias/
+
+# System / IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
