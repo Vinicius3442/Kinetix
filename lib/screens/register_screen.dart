@@ -249,7 +249,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         // Submit Button
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.talpaLava,
+                            backgroundColor: AppColors.kinetixOrange,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(

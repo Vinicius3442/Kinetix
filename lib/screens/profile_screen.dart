@@ -99,10 +99,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 6, vertical: 3),
                       decoration: BoxDecoration(
-                        color: AppColors.electricLime.withOpacity(0.12),
+                        color: AppColors.electricLime.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(4),
                         border: Border.all(
-                            color: AppColors.electricLime.withOpacity(0.3)),
+                            color: AppColors.electricLime.withValues(alpha: 0.3)),
                       ),
                       child: const Text(
                         'Operador',
@@ -135,14 +135,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 gradient: const LinearGradient(
                                   colors: [
                                     AppColors.cyberCyan,
-                                    AppColors.talpaLava
+                                    AppColors.kinetixOrange
                                   ],
                                 ),
                                 border: Border.all(
                                     color: AppColors.cyberCyan, width: 2),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: AppColors.cyberCyan.withOpacity(0.3),
+                                    color: AppColors.cyberCyan.withValues(alpha: 0.3),
                                     blurRadius: 20,
                                   ),
                                 ],
@@ -167,7 +167,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   width: 28,
                                   height: 28,
                                   decoration: const BoxDecoration(
-                                    color: AppColors.talpaLava,
+                                    color: AppColors.kinetixOrange,
                                     shape: BoxShape.circle,
                                   ),
                                   child: const Icon(Icons.edit,
@@ -291,7 +291,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           const SizedBox(height: 14),
                           ElevatedButton.icon(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.talpaLava,
+                              backgroundColor: AppColors.kinetixOrange,
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 12),
                               shape: RoundedRectangleBorder(
@@ -313,10 +313,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     // Logout Button
                     OutlinedButton.icon(
                       style: OutlinedButton.styleFrom(
-                        backgroundColor: AppColors.talpaLava.withOpacity(0.12),
-                        foregroundColor: AppColors.talpaLava,
+                        backgroundColor: AppColors.kinetixOrange.withValues(alpha: 0.12),
+                        foregroundColor: AppColors.kinetixOrange,
                         side: BorderSide(
-                            color: AppColors.talpaLava.withOpacity(0.4)),
+                            color: AppColors.kinetixOrange.withValues(alpha: 0.4)),
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8)),

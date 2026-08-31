@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import 'admin_panel_screen.dart';
@@ -90,14 +91,65 @@ class _DashboardScreenState extends State<DashboardScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _animController;
 
+  // Lista de Cargas Ativas da TransCargo Express
+  final List<Map<String, dynamic>> _cargos = [
+    {
+      'code': 'Carga #TC-8902-SJC',
+      'title': 'Vacinas Termossensíveis',
+      'origin': 'SJC Logística',
+      'dest': 'Caçapava-SP',
+      'status': 'Em Trânsito',
+      'nodeId': 'Kinetix Node #01',
+      'score': 100.0,
+      'impactG': 0.12,
+      'lux': 0,
+      'temp': 22.4,
+      'humidity': 54,
+      'roll': 1.2,
+      'pitch': 0.5,
+    },
+    {
+      'code': 'Carga #TC-4410-SP',
+      'title': 'Componentes Eletrônicos',
+      'origin': 'Terminal Guarulhos',
+      'dest': 'São José dos Campos-SP',
+      'status': 'Em Trânsito',
+      'nodeId': 'Kinetix Node #02',
+      'score': 94.0,
+      'impactG': 0.38,
+      'lux': 0,
+      'temp': 19.8,
+      'humidity': 46,
+      'roll': -0.5,
+      'pitch': 0.8,
+    },
+    {
+      'code': 'Carga #TC-1092-RJ',
+      'title': 'Equipamentos Ópticos',
+      'origin': 'Porto de Santos',
+      'dest': 'Resende-RJ',
+      'status': 'Em Trânsito',
+      'nodeId': 'Kinetix Node #03',
+      'score': 88.0,
+      'impactG': 0.72,
+      'lux': 2,
+      'temp': 24.5,
+      'humidity': 58,
+      'roll': 2.1,
+      'pitch': -1.4,
+    },
+  ];
+
+  int _selectedCargoIndex = 0;
+
   // Telemetry State
-  double score = 100;
-  double impactG = 0.12;
-  int lux = 0;
-  double temp = 22.4;
-  int humidity = 54;
-  double roll = 1.2;
-  double pitch = 0.5;
+  late double score;
+  late double impactG;
+  late int lux;
+  late double temp;
+  late int humidity;
+  late double roll;
+  late double pitch;
 
   bool isImpactAlert = false;
   bool isLdrViolated = false;
@@ -106,10 +158,210 @@ class _DashboardScreenState extends State<DashboardScreen>
   @override
   void initState() {
     super.initState();
+    _loadCargoData(_selectedCargoIndex);
     _animController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 10),
     )..repeat();
+  }
+
+  void _loadCargoData(int index) {
+    final cargo = _cargos[index];
+    setState(() {
+      _selectedCargoIndex = index;
+      score = (cargo['score'] as num).toDouble();
+      impactG = (cargo['impactG'] as num).toDouble();
+      lux = cargo['lux'] as int;
+      temp = (cargo['temp'] as num).toDouble();
+      humidity = cargo['humidity'] as int;
+      roll = (cargo['roll'] as num).toDouble();
+      pitch = (cargo['pitch'] as num).toDouble();
+      isImpactAlert = false;
+      isLdrViolated = false;
+      isTempAlert = false;
+    });
+  }
+
+  void _openCargoSelector() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          decoration: BoxDecoration(
+            color: const Color(0xF70D121B),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            border: Border.all(
+              color: AppColors.cyberCyan.withValues(alpha: 0.3),
+              width: 1.2,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.cyberCyan.withValues(alpha: 0.15),
+                blurRadius: 25,
+                spreadRadius: 1,
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Drag Pill Indicator
+              Center(
+                child: Container(
+                  width: 38,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 14),
+                  decoration: BoxDecoration(
+                    color: AppColors.borderSlate,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Row(
+                    children: [
+                      Icon(Icons.swap_horizontal_circle_outlined,
+                          color: AppColors.cyberCyan, size: 20),
+                      SizedBox(width: 8),
+                      Text(
+                        'SELECIONAR CARGA ATIVA',
+                        style: TextStyle(
+                          color: AppColors.textDisplay,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.6,
+                        ),
+                      ),
+                    ],
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close, color: AppColors.textMuted, size: 20),
+                    onPressed: () => Navigator.of(ctx).pop(),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 2),
+              const Text(
+                'Escolha o volume em trânsito para monitorar a telemetria e o Gêmeo 3D:',
+                style: TextStyle(color: AppColors.textMuted, fontSize: 11),
+              ),
+              const SizedBox(height: 14),
+              ListView.separated(
+                shrinkWrap: true,
+                itemCount: _cargos.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 10),
+                itemBuilder: (context, index) {
+                  final cargo = _cargos[index];
+                  final isSelected = index == _selectedCargoIndex;
+                  return InkWell(
+                    onTap: () {
+                      _loadCargoData(index);
+                      Navigator.of(ctx).pop();
+                    },
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? AppColors.cyberCyan.withValues(alpha: 0.12)
+                            : AppColors.charcoalGlass,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isSelected
+                              ? AppColors.cyberCyan
+                              : AppColors.borderSlate,
+                          width: isSelected ? 1.5 : 1.0,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 32,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: isSelected
+                                  ? AppColors.cyberCyan.withValues(alpha: 0.2)
+                                  : AppColors.obsidianPitch,
+                              border: Border.all(
+                                color: isSelected
+                                    ? AppColors.cyberCyan
+                                    : AppColors.borderSlate,
+                              ),
+                            ),
+                            child: Icon(
+                              isSelected
+                                  ? Icons.check_rounded
+                                  : Icons.inventory_2_outlined,
+                              color: isSelected
+                                  ? AppColors.cyberCyan
+                                  : AppColors.textMuted,
+                              size: 16,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '${cargo['code']} • ${cargo['title']}',
+                                  style: TextStyle(
+                                    color: isSelected
+                                        ? AppColors.cyberCyan
+                                        : AppColors.textDisplay,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  '${cargo['origin']} → ${cargo['dest']}',
+                                  style: const TextStyle(
+                                    color: AppColors.textMuted,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: AppColors.electricLime.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(
+                                  color: AppColors.electricLime.withValues(alpha: 0.3)),
+                            ),
+                            child: Text(
+                              '${(cargo['score'] as num).toInt()}% Score',
+                              style: const TextStyle(
+                                color: AppColors.electricLime,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 12),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -118,51 +370,14 @@ class _DashboardScreenState extends State<DashboardScreen>
     super.dispose();
   }
 
-  void _triggerImpact() {
-    setState(() {
-      impactG = 2.45;
-      roll = 24.5;
-      isImpactAlert = true;
-      score = math.max(0, score - 25);
-    });
-  }
-
-  void _triggerLight() {
-    setState(() {
-      lux = 485;
-      isLdrViolated = true;
-      score = math.max(0, score - 35);
-    });
-  }
-
-  void _triggerTemp() {
-    setState(() {
-      temp = 36.8;
-      isTempAlert = true;
-      score = math.max(0, score - 15);
-    });
-  }
-
-  void _resetStatus() {
-    setState(() {
-      score = 100;
-      impactG = 0.12;
-      lux = 0;
-      temp = 22.4;
-      roll = 1.2;
-      pitch = 0.5;
-      isImpactAlert = false;
-      isLdrViolated = false;
-      isTempAlert = false;
-    });
-  }
-
   void _logout() {
     Navigator.of(context).pushReplacementNamed('/');
   }
 
   @override
   Widget build(BuildContext context) {
+    final currentCargo = _cargos[_selectedCargoIndex];
+
     return SafeArea(
       child: Center(
         child: Container(
@@ -201,7 +416,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                               ),
                             ),
                             Text(
-                              'Talpa Systems • IIoT',
+                              'TransCargo Express • IIoT',
                               style: TextStyle(
                                 color: AppColors.textMuted,
                                 fontSize: 9,
@@ -217,16 +432,16 @@ class _DashboardScreenState extends State<DashboardScreen>
                           padding: const EdgeInsets.symmetric(
                               horizontal: 6, vertical: 3),
                           decoration: BoxDecoration(
-                            color: AppColors.cyberCyan.withOpacity(0.12),
+                            color: AppColors.cyberCyan.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(4),
                             border: Border.all(
-                                color: AppColors.cyberCyan.withOpacity(0.3)),
+                                color: AppColors.cyberCyan.withValues(alpha: 0.3)),
                           ),
-                          child: const Text(
-                            'ESP32-TK89',
-                            style: TextStyle(
+                          child: Text(
+                            currentCargo['nodeId'] as String,
+                            style: const TextStyle(
                               color: AppColors.cyberCyan,
-                              fontSize: 10,
+                              fontSize: 9,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -239,20 +454,20 @@ class _DashboardScreenState extends State<DashboardScreen>
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
-                              color: AppColors.talpaLava.withOpacity(0.12),
+                              color: AppColors.kinetixOrange.withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(6),
                               border: Border.all(
-                                  color: AppColors.talpaLava.withOpacity(0.4)),
+                                  color: AppColors.kinetixOrange.withValues(alpha: 0.4)),
                             ),
                             child: const Row(
                               children: [
                                 Icon(Icons.logout,
-                                    color: AppColors.talpaLava, size: 12),
+                                    color: AppColors.kinetixOrange, size: 12),
                                 SizedBox(width: 4),
                                 Text(
                                   'Sair',
                                   style: TextStyle(
-                                    color: AppColors.talpaLava,
+                                    color: AppColors.kinetixOrange,
                                     fontSize: 10,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -287,7 +502,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                 child: ListView(
                   padding: const EdgeInsets.all(14),
                   children: [
-                    // Route Info Card
+                    // Route Info Card with Cargo Switcher
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
@@ -300,52 +515,98 @@ class _DashboardScreenState extends State<DashboardScreen>
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text(
-                                'Carga #TC-8902-SJC',
-                                style: TextStyle(
-                                  color: AppColors.textDisplay,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      currentCargo['code'] as String,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        color: AppColors.textDisplay,
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      currentCargo['title'] as String,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        color: AppColors.cyberCyan,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 6, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: AppColors.electricLime.withOpacity(0.12),
-                                  borderRadius: BorderRadius.circular(4),
-                                  border: Border.all(
-                                      color: AppColors.electricLime
-                                          .withOpacity(0.3)),
-                                ),
-                                child: const Text(
-                                  'Em Trânsito',
-                                  style: TextStyle(
-                                    color: AppColors.electricLime,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
+                              const SizedBox(width: 8),
+                              InkWell(
+                                onTap: _openCargoSelector,
+                                borderRadius: BorderRadius.circular(6),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.cyberCyan.withValues(alpha: 0.15),
+                                    borderRadius: BorderRadius.circular(6),
+                                    border: Border.all(
+                                        color: AppColors.cyberCyan),
+                                  ),
+                                  child: const Row(
+                                    children: [
+                                      Icon(Icons.swap_horiz,
+                                          color: AppColors.cyberCyan,
+                                          size: 14),
+                                      SizedBox(width: 4),
+                                      Text(
+                                        'TROCAR CARGA',
+                                        style: TextStyle(
+                                          color: AppColors.cyberCyan,
+                                          fontSize: 9,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 6),
-                          const Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          const SizedBox(height: 8),
+                          Row(
                             children: [
-                              Text('Origem: SJC Logística',
-                                  style: TextStyle(
+                              Expanded(
+                                child: Text(
+                                  'Origem: ${currentCargo['origin']}',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
                                       color: AppColors.textSection,
-                                      fontSize: 11)),
-                              Text('→',
-                                  style: TextStyle(
-                                      color: AppColors.cyberCyan,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold)),
-                              Text('Destino: Caçapava-SP',
-                                  style: TextStyle(
+                                      fontSize: 11),
+                                ),
+                              ),
+                              const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 6),
+                                child: Text('→',
+                                    style: TextStyle(
+                                        color: AppColors.cyberCyan,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold)),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  'Destino: ${currentCargo['dest']}',
+                                  textAlign: TextAlign.right,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
                                       color: AppColors.textSection,
-                                      fontSize: 11)),
+                                      fontSize: 11),
+                                ),
+                              ),
                             ],
                           ),
                         ],
@@ -361,13 +622,13 @@ class _DashboardScreenState extends State<DashboardScreen>
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
                           color: (isImpactAlert || isLdrViolated)
-                              ? AppColors.talpaLava
+                              ? AppColors.kinetixOrange
                               : AppColors.borderSlate,
                         ),
                         boxShadow: (isImpactAlert || isLdrViolated)
                             ? [
                                 BoxShadow(
-                                  color: AppColors.talpaLava.withOpacity(0.4),
+                                  color: AppColors.kinetixOrange.withValues(alpha: 0.4),
                                   blurRadius: 16,
                                 )
                               ]
@@ -405,7 +666,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                                     borderRadius: BorderRadius.circular(4),
                                     border: Border.all(
                                         color: AppColors.cyberCyan
-                                            .withOpacity(0.25)),
+                                            .withValues(alpha: 0.25)),
                                   ),
                                   child: Text(
                                     'R: ${roll.toStringAsFixed(1)}° | P: ${pitch.toStringAsFixed(1)}°',
@@ -420,12 +681,12 @@ class _DashboardScreenState extends State<DashboardScreen>
                                       horizontal: 6, vertical: 3),
                                   decoration: BoxDecoration(
                                     color: isImpactAlert
-                                        ? AppColors.talpaLava.withOpacity(0.15)
-                                        : AppColors.electricLime.withOpacity(0.12),
+                                        ? AppColors.kinetixOrange.withValues(alpha: 0.15)
+                                        : AppColors.electricLime.withValues(alpha: 0.12),
                                     borderRadius: BorderRadius.circular(4),
                                     border: Border.all(
                                       color: isImpactAlert
-                                          ? AppColors.talpaLava
+                                          ? AppColors.kinetixOrange
                                           : AppColors.electricLime,
                                     ),
                                   ),
@@ -435,7 +696,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                                         : 'Gêmeo Sincronizado',
                                     style: TextStyle(
                                       color: isImpactAlert
-                                          ? AppColors.talpaLava
+                                          ? AppColors.kinetixOrange
                                           : AppColors.electricLime,
                                       fontSize: 10,
                                       fontWeight: FontWeight.bold,
@@ -475,7 +736,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                                         ? AppColors.electricLime
                                         : (score > 50
                                             ? AppColors.telemetryAmber
-                                            : AppColors.talpaLava),
+                                            : AppColors.kinetixOrange),
                                   ),
                                 ),
                               ),
@@ -504,7 +765,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                                 ),
                                 const SizedBox(height: 2),
                                 const Text(
-                                  'Algoritmo Wegnology: Monitoramento contínuo de aceleração, temperatura e luz.',
+                                  'Algoritmo Kinetix: Monitoramento contínuo de aceleração, temperatura e luz.',
                                   style: TextStyle(
                                     color: AppColors.textMuted,
                                     fontSize: 11,
@@ -530,7 +791,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                               borderRadius: BorderRadius.circular(14),
                               border: Border.all(
                                 color: isImpactAlert
-                                    ? AppColors.talpaLava
+                                    ? AppColors.kinetixOrange
                                     : AppColors.borderSlate,
                               ),
                             ),
@@ -569,7 +830,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                               borderRadius: BorderRadius.circular(14),
                               border: Border.all(
                                 color: isLdrViolated
-                                    ? AppColors.talpaLava
+                                    ? AppColors.kinetixOrange
                                     : AppColors.borderSlate,
                               ),
                             ),
@@ -588,7 +849,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                                   '$lux LUX',
                                   style: TextStyle(
                                       color: isLdrViolated
-                                          ? AppColors.talpaLava
+                                          ? AppColors.kinetixOrange
                                           : AppColors.electricLime,
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold),
@@ -648,108 +909,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     ),
                     const SizedBox(height: 14),
 
-                    // Definitive Action Buttons Panel
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: const Color(0xF2101620),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppColors.borderSlate),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'AÇÕES DE TELEMETRIA EM CAMPO',
-                            style: TextStyle(
-                              color: AppColors.telemetryAmber,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 0.8,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          GridView.count(
-                            crossAxisCount: 2,
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            childAspectRatio: 2.8,
-                            crossAxisSpacing: 8,
-                            mainAxisSpacing: 8,
-                            children: [
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0x26FF5500),
-                                  foregroundColor: AppColors.talpaLava,
-                                  side: const BorderSide(
-                                      color: AppColors.talpaLava),
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(6)),
-                                ),
-                                onPressed: _triggerImpact,
-                                child: const Text(
-                                  'Impacto Dinâmico (2.4G)',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                      fontSize: 10, fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0x26FF5500),
-                                  foregroundColor: AppColors.talpaLava,
-                                  side: const BorderSide(
-                                      color: AppColors.talpaLava),
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(6)),
-                                ),
-                                onPressed: _triggerLight,
-                                child: const Text(
-                                  'Violação Luz LDR',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                      fontSize: 10, fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0x26FFB300),
-                                  foregroundColor: AppColors.telemetryAmber,
-                                  side: const BorderSide(
-                                      color: AppColors.telemetryAmber),
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(6)),
-                                ),
-                                onPressed: _triggerTemp,
-                                child: const Text(
-                                  'Pico Térmico (36.8°C)',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                      fontSize: 10, fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.charcoalGlass,
-                                  foregroundColor: AppColors.textDisplay,
-                                  side: const BorderSide(
-                                      color: AppColors.borderSlate),
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(6)),
-                                ),
-                                onPressed: _resetStatus,
-                                child: const Text(
-                                  'Restaurar Intacto',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                      fontSize: 10, fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
+
                   ],
                 ),
               ),
@@ -816,12 +976,12 @@ class Cube3DPainter extends CustomPainter {
     }).toList();
 
     final linePaint = Paint()
-      ..color = isAlert ? AppColors.talpaLava : AppColors.cyberCyan
+      ..color = isAlert ? AppColors.kinetixOrange : AppColors.cyberCyan
       ..strokeWidth = 2.0
       ..style = PaintingStyle.stroke;
 
     final dotPaint = Paint()
-      ..color = isAlert ? AppColors.talpaLava : AppColors.electricLime
+      ..color = isAlert ? AppColors.kinetixOrange : AppColors.electricLime
       ..style = PaintingStyle.fill;
 
     for (final edge in edges) {

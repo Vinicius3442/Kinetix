@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../widgets/sweet_alert.dart';
@@ -21,236 +22,189 @@ class _TimelineScreenState extends State<TimelineScreen> {
   }) {
     showDialog(
       context: context,
-      builder: (ctx) => Dialog(
-        backgroundColor: Colors.transparent,
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 380),
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            color: const Color(0xFF111722),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.talpaLava, width: 1.2),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.talpaLava.withOpacity(0.3),
-                blurRadius: 20,
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      title,
-                      style: const TextStyle(
-                        color: AppColors.textDisplay,
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
+      builder: (ctx) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Dialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 380),
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: const Color(0xF70D121B),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: AppColors.kinetixOrange.withValues(alpha: 0.5), width: 1.2),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.kinetixOrange.withValues(alpha: 0.2),
+                  blurRadius: 25,
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: const TextStyle(
+                          color: AppColors.textDisplay,
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close,
-                        color: AppColors.textMuted, size: 20),
-                    onPressed: () => Navigator.of(ctx).pop(),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              Text(
-                'Leitura de auditabilidade: $note. Transmitida via MQTT da placa ESP32.',
-                style: const TextStyle(color: AppColors.textSection, fontSize: 11),
-              ),
-              const SizedBox(height: 12),
-
-              // Detail Grid
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: AppColors.charcoalGlass,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: AppColors.borderSlate),
-                ),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('TIMESTAMP RTC',
-                                  style: TextStyle(
-                                      color: AppColors.textLog, fontSize: 9)),
-                              Text(time,
-                                  style: const TextStyle(
-                                      color: AppColors.cyberCyan,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold)),
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('SENSOR ORIGEM',
-                                  style: TextStyle(
-                                      color: AppColors.textLog, fontSize: 9)),
-                              Text(sensor,
-                                  style: const TextStyle(
-                                      color: AppColors.cyberCyan,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold)),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('MÉTRICA / VALOR',
-                                  style: TextStyle(
-                                      color: AppColors.textLog, fontSize: 9)),
-                              Text(val,
-                                  style: const TextStyle(
-                                      color: AppColors.talpaLava,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold)),
-                            ],
-                          ),
-                        ),
-                        const Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('STATUS',
-                                  style: TextStyle(
-                                      color: AppColors.textLog, fontSize: 9)),
-                              Text('ALERTA ATIVO',
-                                  style: TextStyle(
-                                      color: AppColors.talpaLava,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold)),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('GEOLOCALIZAÇÃO GPS SATÉLITE',
-                            style: TextStyle(
-                                color: AppColors.textLog, fontSize: 9)),
-                        Text(gps,
-                            style: const TextStyle(
-                                color: AppColors.cyberCyan,
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold)),
-                      ],
+                    IconButton(
+                      icon: const Icon(Icons.close,
+                          color: AppColors.textMuted, size: 20),
+                      onPressed: () => Navigator.of(ctx).pop(),
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(height: 14),
+                const SizedBox(height: 4),
+                Text(
+                  'Registro auditável: $note.',
+                  style: const TextStyle(color: AppColors.textSection, fontSize: 11),
+                ),
+                const SizedBox(height: 14),
 
-              // Action Buttons
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.talpaLava,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8)),
+                // Detail Grid
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppColors.charcoalGlass,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: AppColors.borderSlate),
                   ),
-                  onPressed: () {
-                    Navigator.of(ctx).pop();
-                    showKinetixSweetAlert(
-                      context,
-                      title: 'Alerta Despachado!',
-                      message:
-                          'Notificação de emergência disparada via Webhook Wegnology para a central TransCargo.',
-                      type: SweetAlertType.success,
-                    );
-                  },
-                  icon: const Icon(Icons.warning_amber_rounded, size: 16),
-                  label: const Text(
-                    'Despachar Alerta de Emergência',
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('TIMESTAMP RTC',
+                                    style: TextStyle(
+                                        color: AppColors.textLog, fontSize: 9, fontWeight: FontWeight.bold)),
+                                const SizedBox(height: 2),
+                                Text(time,
+                                    style: const TextStyle(
+                                        color: AppColors.cyberCyan,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('SENSOR ORIGEM',
+                                    style: TextStyle(
+                                        color: AppColors.textLog, fontSize: 9, fontWeight: FontWeight.bold)),
+                                const SizedBox(height: 2),
+                                Text(sensor,
+                                    style: const TextStyle(
+                                        color: AppColors.cyberCyan,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('MÉTRICA / VALOR',
+                                    style: TextStyle(
+                                        color: AppColors.textLog, fontSize: 9, fontWeight: FontWeight.bold)),
+                                const SizedBox(height: 2),
+                                Text(val,
+                                    style: const TextStyle(
+                                        color: AppColors.kinetixOrange,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                          ),
+                          const Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('STATUS',
+                                    style: TextStyle(
+                                        color: AppColors.textLog, fontSize: 9, fontWeight: FontWeight.bold)),
+                                SizedBox(height: 2),
+                                Text('ALERTA REGISTRADO',
+                                    style: TextStyle(
+                                        color: AppColors.kinetixOrange,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('GEOLOCALIZAÇÃO GPS',
+                              style: TextStyle(
+                                  color: AppColors.textLog, fontSize: 9, fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 2),
+                          Text(gps,
+                              style: const TextStyle(
+                                  color: AppColors.cyberCyan,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-              ),
-              const SizedBox(height: 6),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.textDisplay,
-                    side: const BorderSide(color: AppColors.borderSlate),
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8)),
-                  ),
-                  onPressed: () {
-                    Navigator.of(ctx).pop();
-                    showKinetixSweetAlert(
-                      context,
-                      title: 'Alerta Reconhecido!',
-                      message:
-                          'Carimbo de ciência do operador gravado nos registros de auditoria.',
-                      type: SweetAlertType.success,
-                    );
-                  },
-                  icon: const Icon(Icons.check, size: 16),
-                  label: const Text(
-                    'Reconhecer Alerta / Marcar Ciente',
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 6),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.textDisplay,
-                    side: const BorderSide(color: AppColors.borderSlate),
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8)),
-                  ),
-                  onPressed: () {
-                    Navigator.of(ctx).pop();
-                    showKinetixSweetAlert(
-                      context,
-                      title: 'Inspeção Solicitada!',
-                      message:
-                          'Ordem de verificação físico-mecânica enviada para o próximo posto de controle.',
-                      type: SweetAlertType.success,
-                    );
-                  },
-                  icon: const Icon(Icons.build_outlined, size: 16),
-                  label: const Text(
-                    'Solicitar Inspeção Físico-Mecânica',
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                const SizedBox(height: 16),
+
+                // Action Buttons
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.kinetixOrange,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 11),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8)),
+                    ),
+                    onPressed: () {
+                      Navigator.of(ctx).pop();
+                      showKinetixSweetAlert(
+                        context,
+                        title: 'Alerta Reconhecido!',
+                        message:
+                            'Ciência do operador gravada no registro de auditoria.',
+                        type: SweetAlertType.success,
+                      );
+                    },
+                    icon: const Icon(Icons.check_circle_outline, size: 16),
+                    label: const Text(
+                      'Reconhecer Alerta / Marcar Ciente',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -311,10 +265,10 @@ class _TimelineScreenState extends State<TimelineScreen> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 6, vertical: 3),
                       decoration: BoxDecoration(
-                        color: AppColors.cyberCyan.withOpacity(0.12),
+                        color: AppColors.cyberCyan.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(4),
                         border: Border.all(
-                            color: AppColors.cyberCyan.withOpacity(0.3)),
+                            color: AppColors.cyberCyan.withValues(alpha: 0.3)),
                       ),
                       child: const Text(
                         'RTC / GPS',
@@ -353,10 +307,10 @@ class _TimelineScreenState extends State<TimelineScreen> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: AppColors.telemetryAmber.withOpacity(0.06),
+                        color: AppColors.telemetryAmber.withValues(alpha: 0.06),
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
-                            color: AppColors.telemetryAmber.withOpacity(0.3)),
+                            color: AppColors.telemetryAmber.withValues(alpha: 0.3)),
                       ),
                       child: const Row(
                         children: [
@@ -377,7 +331,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
                                 ),
                                 SizedBox(height: 2),
                                 Text(
-                                  '18 pacotes retidos na memória interna • Sincronização automática via Wegnology',
+                                  '18 pacotes retidos na memória interna • Sincronização automática via API Kinetix',
                                   style: TextStyle(
                                     color: AppColors.textMuted,
                                     fontSize: 10,
@@ -501,9 +455,9 @@ class _TimelineScreenState extends State<TimelineScreen> {
     bool isWarn = false,
   }) {
     final borderColor = isAlert
-        ? AppColors.talpaLava.withOpacity(0.5)
+        ? AppColors.kinetixOrange.withValues(alpha: 0.5)
         : (isWarn
-            ? AppColors.telemetryAmber.withOpacity(0.5)
+            ? AppColors.telemetryAmber.withValues(alpha: 0.5)
             : AppColors.borderSlate);
 
     return InkWell(
@@ -538,11 +492,17 @@ class _TimelineScreenState extends State<TimelineScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Text(
-                  gps,
-                  style: const TextStyle(
-                    color: AppColors.textLog,
-                    fontSize: 9,
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    gps,
+                    textAlign: TextAlign.right,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: AppColors.textLog,
+                      fontSize: 9,
+                    ),
                   ),
                 ),
               ],
@@ -550,6 +510,8 @@ class _TimelineScreenState extends State<TimelineScreen> {
             const SizedBox(height: 4),
             Text(
               title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 color: AppColors.textDisplay,
                 fontSize: 12,
@@ -559,6 +521,8 @@ class _TimelineScreenState extends State<TimelineScreen> {
             const SizedBox(height: 2),
             Text(
               sub,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 color: AppColors.textMuted,
                 fontSize: 10,
@@ -567,12 +531,16 @@ class _TimelineScreenState extends State<TimelineScreen> {
             const SizedBox(height: 4),
             const Row(
               children: [
-                Text(
-                  '→ Toque para abrir detalhes e ações operacionais',
-                  style: TextStyle(
-                    color: AppColors.cyberCyan,
-                    fontSize: 9,
-                    fontWeight: FontWeight.bold,
+                Expanded(
+                  child: Text(
+                    '→ Toque para abrir detalhes e ações operacionais',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: AppColors.cyberCyan,
+                      fontSize: 9,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ],

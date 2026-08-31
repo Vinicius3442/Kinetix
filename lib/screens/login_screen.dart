@@ -79,7 +79,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const SizedBox(height: 6),
                       const Text(
-                        'Talpa Systems • TransCargo Express Cargo Intelligence',
+                        'TransCargo Express • Kinetix Cargo Intelligence',
                         style: TextStyle(
                           color: AppColors.textMuted,
                           fontSize: 11,
@@ -118,7 +118,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         vertical: 8),
                                     decoration: BoxDecoration(
                                       color: _selectedRole == 'op'
-                                          ? AppColors.cyberCyan.withOpacity(0.15)
+                                          ? AppColors.cyberCyan.withValues(alpha: 0.15)
                                           : Colors.transparent,
                                       borderRadius: BorderRadius.circular(6),
                                       border: Border.all(
@@ -150,7 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         vertical: 8),
                                     decoration: BoxDecoration(
                                       color: _selectedRole == 'admin'
-                                          ? AppColors.cyberCyan.withOpacity(0.15)
+                                          ? AppColors.cyberCyan.withValues(alpha: 0.15)
                                           : Colors.transparent,
                                       borderRadius: BorderRadius.circular(6),
                                       border: Border.all(
@@ -291,7 +291,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         // Submit Button
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.talpaLava,
+                            backgroundColor: AppColors.kinetixOrange,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(

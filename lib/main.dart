@@ -12,17 +12,16 @@ class KinetixApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Kinetix - Talpa Systems',
+      title: 'Kinetix - TransCargo Express',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.dark,
         scaffoldBackgroundColor: AppColors.obsidianPitch,
-        primaryColor: AppColors.talpaLava,
+        primaryColor: AppColors.kinetixOrange,
         colorScheme: const ColorScheme.dark(
-          primary: AppColors.talpaLava,
+          primary: AppColors.kinetixOrange,
           secondary: AppColors.cyberCyan,
           surface: AppColors.charcoalGlass,
-          background: AppColors.obsidianPitch,
         ),
         fontFamily: 'Plus Jakarta Sans',
         useMaterial3: true,

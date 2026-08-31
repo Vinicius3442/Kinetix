@@ -12,83 +12,111 @@ void showKinetixSweetAlert(
   VoidCallback? onConfirm,
 }) {
   final isSuccess = type == SweetAlertType.success;
-  final accentColor = isSuccess ? AppColors.electricLime : AppColors.talpaLava;
+  final accentColor = isSuccess ? AppColors.electricLime : AppColors.kinetixOrange;
 
   showDialog(
     context: context,
     barrierDismissible: false,
     builder: (ctx) => BackdropFilter(
-      filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+      filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
       child: Dialog(
         backgroundColor: Colors.transparent,
         elevation: 0,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 20),
         child: Container(
           width: double.infinity,
-          constraints: const BoxConstraints(maxWidth: 340),
-          padding: const EdgeInsets.all(24),
+          constraints: const BoxConstraints(maxWidth: 360),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 26),
           decoration: BoxDecoration(
-            color: const Color(0xFF111722),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppColors.cyberCyan, width: 1.2),
+            color: const Color(0xF70D121B),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: accentColor.withValues(alpha: 0.5),
+              width: 1.5,
+            ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.cyberCyan.withValues(alpha: 0.25),
-                blurRadius: 25,
+                color: accentColor.withValues(alpha: 0.2),
+                blurRadius: 35,
                 spreadRadius: 2,
+              ),
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.6),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
               ),
             ],
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // Glowing Icon Badge
               Container(
-                width: 60,
-                height: 60,
+                width: 64,
+                height: 64,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: accentColor.withOpacity(0.12),
+                  color: accentColor.withValues(alpha: 0.12),
                   border: Border.all(color: accentColor, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: accentColor.withValues(alpha: 0.3),
+                      blurRadius: 15,
+                    ),
+                  ],
                 ),
                 child: Icon(
                   isSuccess
-                      ? Icons.check_circle_outline
+                      ? Icons.check_circle_rounded
                       : Icons.warning_amber_rounded,
                   color: accentColor,
-                  size: 32,
+                  size: 34,
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 18),
+
+              // Title
               Text(
                 title,
                 textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   color: AppColors.textDisplay,
-                  fontSize: 16,
+                  fontSize: 17,
                   fontWeight: FontWeight.bold,
+                  letterSpacing: 0.3,
                 ),
               ),
               const SizedBox(height: 10),
+
+              // Message
               Text(
                 message,
                 textAlign: TextAlign.center,
+                maxLines: 5,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
-                  color: AppColors.textMuted,
-                  fontSize: 12,
-                  height: 1.4,
+                  color: AppColors.textSection,
+                  fontSize: 13,
+                  height: 1.45,
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 22),
+
+              // Action Button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.cyberCyan,
+                    backgroundColor: accentColor,
                     foregroundColor: const Color(0xFF0B0E14),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    padding: const EdgeInsets.symmetric(vertical: 13),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    elevation: 4,
+                    elevation: 6,
+                    shadowColor: accentColor.withValues(alpha: 0.4),
                   ),
                   onPressed: () {
                     Navigator.of(ctx).pop();
@@ -97,11 +125,11 @@ void showKinetixSweetAlert(
                     }
                   },
                   child: const Text(
-                    'ENTENDIDO',
+                    'OK, ENTENDIDO',
                     style: TextStyle(
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w800,
                       fontSize: 12,
-                      letterSpacing: 0.8,
+                      letterSpacing: 1.0,
                     ),
                   ),
                 ),

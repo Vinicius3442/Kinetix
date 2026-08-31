@@ -99,7 +99,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
       context,
       title: 'Dispositivo Pareado!',
       message:
-          'Sensor Embarcado $devId cadastrado e sincronizado via MQTT com a nuvem Wegnology.',
+          'Sensor Embarcado $devId cadastrado e sincronizado via MQTT com a API Kinetix.',
       type: SweetAlertType.success,
     );
   }
@@ -168,15 +168,15 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 6, vertical: 3),
                       decoration: BoxDecoration(
-                        color: AppColors.talpaLava.withOpacity(0.15),
+                        color: AppColors.kinetixOrange.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(4),
                         border: Border.all(
-                            color: AppColors.talpaLava.withOpacity(0.4)),
+                            color: AppColors.kinetixOrange.withValues(alpha: 0.4)),
                       ),
                       child: const Text(
                         'Acesso Restrito',
                         style: TextStyle(
-                          color: AppColors.talpaLava,
+                          color: AppColors.kinetixOrange,
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
                         ),
@@ -233,7 +233,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
             color: isActive
-                ? AppColors.cyberCyan.withOpacity(0.15)
+                ? AppColors.cyberCyan.withValues(alpha: 0.15)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(6),
             border: Border.all(
@@ -279,10 +279,10 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: AppColors.cyberCyan.withOpacity(0.12),
+                  color: AppColors.cyberCyan.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(4),
                   border: Border.all(
-                      color: AppColors.cyberCyan.withOpacity(0.3)),
+                      color: AppColors.cyberCyan.withValues(alpha: 0.3)),
                 ),
                 child: Text(
                   '${_users.length} Usuários',
@@ -314,7 +314,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                   border: Border.all(
                     color: isActive
                         ? AppColors.borderSlate
-                        : AppColors.talpaLava.withOpacity(0.4),
+                        : AppColors.kinetixOrange.withValues(alpha: 0.4),
                   ),
                 ),
                 child: Column(
@@ -347,13 +347,13 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                               horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
                             color: isActive
-                                ? AppColors.electricLime.withOpacity(0.12)
-                                : AppColors.talpaLava.withOpacity(0.15),
+                                ? AppColors.electricLime.withValues(alpha: 0.12)
+                                : AppColors.kinetixOrange.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(4),
                             border: Border.all(
                               color: isActive
                                   ? AppColors.electricLime
-                                  : AppColors.talpaLava,
+                                  : AppColors.kinetixOrange,
                             ),
                           ),
                           child: Text(
@@ -361,7 +361,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                             style: TextStyle(
                               color: isActive
                                   ? AppColors.electricLime
-                                  : AppColors.talpaLava,
+                                  : AppColors.kinetixOrange,
                               fontSize: 9,
                               fontWeight: FontWeight.bold,
                             ),
@@ -404,14 +404,14 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: isActive
-                                  ? AppColors.talpaLava.withOpacity(0.15)
-                                  : AppColors.electricLime.withOpacity(0.15),
+                                  ? AppColors.kinetixOrange.withValues(alpha: 0.15)
+                                  : AppColors.electricLime.withValues(alpha: 0.15),
                               foregroundColor: isActive
-                                  ? AppColors.talpaLava
+                                  ? AppColors.kinetixOrange
                                   : AppColors.electricLime,
                               side: BorderSide(
                                   color: isActive
-                                      ? AppColors.talpaLava
+                                      ? AppColors.kinetixOrange
                                       : AppColors.electricLime),
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 10, vertical: 4),
@@ -462,10 +462,10 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: AppColors.cyberCyan.withOpacity(0.12),
+                  color: AppColors.cyberCyan.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(4),
                   border:
-                      Border.all(color: AppColors.cyberCyan.withOpacity(0.3)),
+                      Border.all(color: AppColors.cyberCyan.withValues(alpha: 0.3)),
                 ),
                 child: const Text(
                   'ESP32 Principal',
@@ -513,7 +513,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
             ),
           ),
           const SizedBox(height: 10),
-          const Text('TÓPICO MQTT WEGNOLOGY',
+          const Text('TÓPICO MQTT KINETIX BROKER',
               style: TextStyle(color: AppColors.textSection, fontSize: 10)),
           const SizedBox(height: 4),
           TextField(
@@ -532,7 +532,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
           const SizedBox(height: 14),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.talpaLava,
+              backgroundColor: AppColors.kinetixOrange,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 12),
               shape: RoundedRectangleBorder(
@@ -622,7 +622,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
           const SizedBox(height: 14),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.talpaLava,
+              backgroundColor: AppColors.kinetixOrange,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 12),
               shape: RoundedRectangleBorder(

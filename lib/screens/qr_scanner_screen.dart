@@ -33,9 +33,9 @@ class _QrScannerScreenState extends State<QrScannerScreen>
   void _scanQrCode() {
     showKinetixSweetAlert(
       context,
-      title: 'QR Code Lido com Sucesso!',
+      title: 'QR Code Autenticado!',
       message:
-          'Etiqueta Vinílica QR #TK89-2026 autenticada. Histórico telemétrico e certificado de integridade 100% validados no destino.',
+          'Etiqueta Vinílica QR #KINETIX-2026 autenticada. Histórico validado.',
       type: SweetAlertType.success,
     );
   }
@@ -49,7 +49,7 @@ class _QrScannerScreenState extends State<QrScannerScreen>
       context,
       title: 'Recebimento Confirmado!',
       message:
-          'Assinatura Digital transmitida via Webhook de alta prioridade para a API TransCargo Express.',
+          'Assinatura digital registrada e sincronizada com a API TransCargo Express.',
       type: SweetAlertType.success,
     );
   }
@@ -108,15 +108,15 @@ class _QrScannerScreenState extends State<QrScannerScreen>
                       padding: const EdgeInsets.symmetric(
                           horizontal: 6, vertical: 3),
                       decoration: BoxDecoration(
-                        color: AppColors.talpaLava.withOpacity(0.15),
+                        color: AppColors.kinetixOrange.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(4),
                         border: Border.all(
-                            color: AppColors.talpaLava.withOpacity(0.4)),
+                            color: AppColors.kinetixOrange.withValues(alpha: 0.4)),
                       ),
                       child: const Text(
-                        'QR #TK89',
+                        'QR #KINETIX',
                         style: TextStyle(
-                          color: AppColors.talpaLava,
+                          color: AppColors.kinetixOrange,
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
                         ),
@@ -132,7 +132,7 @@ class _QrScannerScreenState extends State<QrScannerScreen>
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                 color: AppColors.charcoalGlass,
                 child: const Text(
-                  '"Relatórios instantâneos e rastreáveis na ponta de entrega via QR Code."',
+                  '"Relatórios rastreáveis na ponta de entrega via QR Code."',
                   style: TextStyle(
                     color: AppColors.cyberCyan,
                     fontSize: 10,
@@ -162,7 +162,7 @@ class _QrScannerScreenState extends State<QrScannerScreen>
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
-                                color: AppColors.talpaLava, width: 2),
+                                color: AppColors.kinetixOrange, width: 2),
                           ),
                           child: Stack(
                             children: [
@@ -176,10 +176,10 @@ class _QrScannerScreenState extends State<QrScannerScreen>
                                     child: Container(
                                       height: 2,
                                       decoration: const BoxDecoration(
-                                        color: AppColors.talpaLava,
+                                        color: AppColors.kinetixOrange,
                                         boxShadow: [
                                           BoxShadow(
-                                            color: AppColors.talpaLava,
+                                            color: AppColors.kinetixOrange,
                                             blurRadius: 8,
                                             spreadRadius: 1,
                                           )
@@ -222,16 +222,16 @@ class _QrScannerScreenState extends State<QrScannerScreen>
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 6, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: AppColors.talpaLava.withOpacity(0.15),
+                                  color: AppColors.kinetixOrange.withValues(alpha: 0.15),
                                   borderRadius: BorderRadius.circular(4),
                                   border: Border.all(
-                                      color: AppColors.talpaLava
-                                          .withOpacity(0.4)),
+                                      color: AppColors.kinetixOrange
+                                          .withValues(alpha: 0.4)),
                                 ),
                                 child: const Text(
                                   'Case ABS 3D Fosco',
                                   style: TextStyle(
-                                    color: AppColors.talpaLava,
+                                    color: AppColors.kinetixOrange,
                                     fontSize: 9,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -241,7 +241,7 @@ class _QrScannerScreenState extends State<QrScannerScreen>
                           ),
                           const SizedBox(height: 6),
                           const Text(
-                            'Leitura do QR Code na cor Talpa Lava (#FF5500) para conferir a linha do tempo do transporte antes de assinar o recebimento.',
+                            'Leitura do QR Code Kinetix Laranja (#FF5500) para conferir a linha do tempo do transporte antes de assinar o recebimento.',
                             style: TextStyle(
                               color: AppColors.textMuted,
                               fontSize: 11,
@@ -254,10 +254,10 @@ class _QrScannerScreenState extends State<QrScannerScreen>
                             child: ElevatedButton.icon(
                               style: ElevatedButton.styleFrom(
                                 backgroundColor:
-                                    AppColors.talpaLava.withOpacity(0.15),
-                                foregroundColor: AppColors.talpaLava,
+                                    AppColors.kinetixOrange.withValues(alpha: 0.15),
+                                foregroundColor: AppColors.kinetixOrange,
                                 side: const BorderSide(
-                                    color: AppColors.talpaLava),
+                                    color: AppColors.kinetixOrange),
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 10),
                                 shape: RoundedRectangleBorder(
@@ -304,11 +304,11 @@ class _QrScannerScreenState extends State<QrScannerScreen>
                                     horizontal: 6, vertical: 2),
                                 decoration: BoxDecoration(
                                   color:
-                                      AppColors.electricLime.withOpacity(0.12),
+                                      AppColors.electricLime.withValues(alpha: 0.12),
                                   borderRadius: BorderRadius.circular(4),
                                   border: Border.all(
                                       color: AppColors.electricLime
-                                          .withOpacity(0.3)),
+                                          .withValues(alpha: 0.3)),
                                 ),
                                 child: Text(
                                   _isSigned
@@ -378,7 +378,7 @@ class _QrScannerScreenState extends State<QrScannerScreen>
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                 backgroundColor:
-                                    AppColors.electricLime.withOpacity(0.15),
+                                    AppColors.electricLime.withValues(alpha: 0.15),
                                 foregroundColor: AppColors.electricLime,
                                 side: const BorderSide(
                                     color: AppColors.electricLime),

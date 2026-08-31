@@ -32,7 +32,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     {
       'title': 'Certificado Digital no Destino',
       'desc':
-          'Escaneie a etiqueta vinílica QR #TK89 ao entregar a carga e colha a assinatura digital do destinatário com validação via Webhook.',
+          'Escaneie a etiqueta vinílica QR #KINETIX ao entregar a carga e colha a assinatura digital do destinatário com validação via Webhook.',
       'icon': Icons.qr_code_scanner,
       'color': AppColors.electricLime,
     },
@@ -124,7 +124,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 boxShadow: [
                                   BoxShadow(
                                     color: (slide['color'] as Color)
-                                        .withOpacity(0.15),
+                                        .withValues(alpha: 0.15),
                                     blurRadius: 30,
                                     spreadRadius: 2,
                                   ),
@@ -187,7 +187,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                   ? [
                                       BoxShadow(
                                         color:
-                                            AppColors.cyberCyan.withOpacity(0.5),
+                                            AppColors.cyberCyan.withValues(alpha: 0.5),
                                         blurRadius: 10,
                                       )
                                     ]
@@ -203,7 +203,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         width: double.infinity,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.talpaLava,
+                            backgroundColor: AppColors.kinetixOrange,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(
