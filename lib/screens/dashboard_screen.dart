@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
+import '../widgets/web_3d_viewer.dart';
 import 'admin_panel_screen.dart';
 import 'profile_screen.dart';
 import 'qr_scanner_screen.dart';
@@ -396,36 +397,45 @@ class _DashboardScreenState extends State<DashboardScreen>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        Image.asset(
-                          'Imagens/logo sem fundo.webp',
-                          height: 48,
-                          fit: BoxFit.contain,
-                        ),
-                        const SizedBox(width: 10),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text(
-                              'KINETIX',
-                              style: TextStyle(
-                                color: AppColors.textDisplay,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Image.asset(
+                            'Imagens/logo sem fundo.webp',
+                            height: 40,
+                            fit: BoxFit.contain,
+                          ),
+                          const SizedBox(width: 8),
+                          const Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'KINETIX',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: AppColors.textDisplay,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  'TransCargo Express',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: AppColors.textMuted,
+                                    fontSize: 9,
+                                  ),
+                                ),
+                              ],
                             ),
-                            Text(
-                              'TransCargo Express • IIoT',
-                              style: TextStyle(
-                                color: AppColors.textMuted,
-                                fontSize: 9,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+                          ),
+                        ],
+                      ),
                     ),
+                    const SizedBox(width: 6),
                     Row(
                       children: [
                         Container(
@@ -636,21 +646,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                       ),
                       child: Stack(
                         children: [
-                          AnimatedBuilder(
-                            animation: _animController,
-                            builder: (context, child) {
-                              return CustomPaint(
-                                size: const Size(double.infinity, 200),
-                                painter: Cube3DPainter(
-                                  rotationY:
-                                      _animController.value * 2 * math.pi,
-                                  roll: roll,
-                                  pitch: pitch,
-                                  isAlert: isImpactAlert || isLdrViolated,
-                                ),
-                              );
-                            },
-                          ),
+                          build3DGlbViewer(),
                           Positioned(
                             top: 8,
                             left: 10,
@@ -690,17 +686,25 @@ class _DashboardScreenState extends State<DashboardScreen>
                                           : AppColors.electricLime,
                                     ),
                                   ),
-                                  child: Text(
-                                    isImpactAlert
-                                        ? 'Impacto Detectado'
-                                        : 'Gêmeo Sincronizado',
-                                    style: TextStyle(
-                                      color: isImpactAlert
-                                          ? AppColors.kinetixOrange
-                                          : AppColors.electricLime,
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(Icons.view_in_ar,
+                                          color: AppColors.electricLime, size: 12),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        isImpactAlert
+                                            ? 'Impacto Detectado'
+                                            : 'GLB: bio_crate.glb • Sincronizado',
+                                        style: TextStyle(
+                                          color: isImpactAlert
+                                              ? AppColors.kinetixOrange
+                                              : AppColors.electricLime,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],

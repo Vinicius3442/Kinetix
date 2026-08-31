@@ -19,5 +19,6 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - Imagens/logo sem fundo.webp
-    - Imagens/logo com fundo.webp
+    - Imagens/
+    - assets/models/
+    - assets/models/bio_crate.glb
