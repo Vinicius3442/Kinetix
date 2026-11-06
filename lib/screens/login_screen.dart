@@ -72,8 +72,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         '"Sensibilidade total onde os olhos não alcançam."',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: AppColors.cyberCyan,
-                          fontSize: 12,
+                          color: AppColors.textSection,
+                          fontSize: 11.5,
                           fontStyle: FontStyle.italic,
                         ),
                       ),

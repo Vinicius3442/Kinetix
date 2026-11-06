@@ -110,13 +110,13 @@ void showKinetixSweetAlert(
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: accentColor,
-                    foregroundColor: const Color(0xFF0B0E14),
+                    foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 13),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    elevation: 6,
-                    shadowColor: accentColor.withValues(alpha: 0.4),
+                    elevation: 3,
+                    shadowColor: accentColor.withValues(alpha: 0.25),
                   ),
                   onPressed: () {
                     Navigator.of(ctx).pop();

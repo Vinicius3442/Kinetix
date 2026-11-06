@@ -61,7 +61,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         '"A inteligência que enxerga no escuro da carga."',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: AppColors.cyberCyan,
+                          color: AppColors.textSection,
                           fontSize: 11,
                           fontStyle: FontStyle.italic,
                         ),
