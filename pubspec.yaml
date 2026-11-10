@@ -1,24 +1,55 @@
 name: kinetix
-description: "Kinetix Mobile - TransCargo Express Industrial IoT & Cargo Intelligence"
+description: "Kinetix — monitoramento inteligente de cargas (Talpa Systems)."
 publish_to: 'none'
-version: 1.0.0+1
+version: 2.0.0+2
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: '>=3.4.0 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
-  cupertino_icons: ^1.0.8
+  flutter_localizations:
+    sdk: flutter
+  kinetix_core:
+    path: packages/kinetix_core
+  go_router: ^18.1.4
+  flutter_riverpod: ^3.5.0
+  supabase_flutter: ^2.18.3
+  mqtt_client: ^10.14.0
+  mobile_scanner: ^7.5.0
+  qr_flutter: ^4.1.0
+  fl_chart: ^1.3.1
+  flutter_map: ^8.3.2
+  latlong2: ^0.10.1
+  flutter_svg: ^2.3.2
+  intl: ^0.20.2
+  shared_preferences: ^2.5.6
+  vector_math: ^2.1.4
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.0
+  flutter_lints: ^3.0.2
 
 flutter:
   uses-material-design: true
   assets:
-    - Imagens/
-    - assets/models/
-    - assets/models/bio_crate.glb
+    - assets/brand/
+  fonts:
+    - family: PlusJakartaSans
+      fonts:
+        - asset: assets/fonts/PlusJakartaSans-400.ttf
+        - asset: assets/fonts/PlusJakartaSans-500.ttf
+          weight: 500
+        - asset: assets/fonts/PlusJakartaSans-600.ttf
+          weight: 600
+        - asset: assets/fonts/PlusJakartaSans-700.ttf
+          weight: 700
+        - asset: assets/fonts/PlusJakartaSans-800.ttf
+          weight: 800
+    - family: JetBrainsMono
+      fonts:
+        - asset: assets/fonts/JetBrainsMono-400.ttf
+        - asset: assets/fonts/JetBrainsMono-700.ttf
+          weight: 700

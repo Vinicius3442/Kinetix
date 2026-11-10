@@ -1,9 +1,43 @@
-# References directory containing PDF documents (Confidential / Internal)
+# Referências (documentos internos)
 referencias/
 Referencias/
 
-# System / IDE files
+# Sistema / IDE
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
+*.iml
+*.ipr
+*.iws
+
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+coverage/
+*.g.dart.bak
+
+# Android
+**/android/**/gradle-wrapper.jar
+**/android/.gradle
+**/android/captures/
+**/android/gradlew
+**/android/gradlew.bat
+**/android/local.properties
+**/android/**/GeneratedPluginRegistrant.java
+**/android/key.properties
+*.jks
+
+# Segredos locais (nunca versionar)
+.env
+.env.*
+!.env.example
+bridge/.env
+
+# Configuração local do app (copie de config.example.json)
+config.json
