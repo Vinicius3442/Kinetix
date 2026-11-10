@@ -121,8 +121,7 @@ enum ShipmentStatus {
   bool get isActive => this == preparing || this == inTransit;
   bool get isClosed => !isActive;
 
-  static ShipmentStatus fromCode(String? c) =>
-      ShipmentStatus.values.firstWhere((s) => s.code == c, orElse: () => ShipmentStatus.preparing);
+  static ShipmentStatus fromCode(String? c) => ShipmentStatus.values.firstWhere((s) => s.code == c, orElse: () => ShipmentStatus.preparing);
 }
 
 /// Categorias com faixas seguras sugeridas.
@@ -330,9 +329,7 @@ class ReceiptSummary {
     final stats = (j['stats'] as Map<String, dynamic>?) ?? const {};
     return ReceiptSummary(
       shipment: Shipment.fromJson(j['shipment'] as Map<String, dynamic>),
-      events: ((j['events'] as List?) ?? const [])
-          .map((e) => CargoEvent.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      events: ((j['events'] as List?) ?? const []).map((e) => CargoEvent.fromJson(e as Map<String, dynamic>)).toList(),
       receipt: j['receipt'] == null ? null : Receipt.fromJson(j['receipt'] as Map<String, dynamic>),
       tempMin: (stats['temp_min'] as num?)?.toDouble(),
       tempMax: (stats['temp_max'] as num?)?.toDouble(),

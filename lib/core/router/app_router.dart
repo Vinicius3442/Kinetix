@@ -58,7 +58,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (Routes.isPublic(path) && !path.startsWith(Routes.login) && !path.startsWith(Routes.register)) {
         return null; // QR Code e recuperação de senha funcionam sem login
       }
-      if (s.isLoading && !s.hasValue) return path == Routes.splash ? null : '${Routes.splash}?para=${Uri.encodeComponent(state.uri.toString())}';
+      if (s.isLoading && !s.hasValue) {
+        return path == Routes.splash ? null : '${Routes.splash}?para=${Uri.encodeComponent(state.uri.toString())}';
+      }
       final me = s.value;
       if (me == null) {
         if (Routes.isPublic(path)) return null;

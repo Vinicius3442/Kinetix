@@ -77,9 +77,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                           SizedBox(
                             height: 230,
-                            child: i == 1
-                                ? const _DemoTwin()
-                                : Icon(icon, size: 110, color: i == 0 ? KxColors.cyberCyan : KxColors.talpaLava),
+                            child:
+                                i == 1 ? const _DemoTwin() : Icon(icon, size: 110, color: i == 0 ? KxColors.cyberCyan : KxColors.talpaLava),
                           ),
                           const SizedBox(height: KxSpace.xl),
                           Text('PASSO ${i + 1} DE ${_steps.length}', style: KxText.label.copyWith(color: KxColors.cyberCyan)),
@@ -108,9 +107,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: FilledButton(
-                      onPressed: last
-                          ? _finish
-                          : () => _page.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeOut),
+                      onPressed: last ? _finish : () => _page.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeOut),
                       child: Text(last ? 'Começar a usar' : 'Próximo'),
                     ),
                   ),

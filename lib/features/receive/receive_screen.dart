@@ -75,11 +75,13 @@ class _Header extends StatelessWidget {
   Widget build(BuildContext context) {
     final s = summary.shipment;
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(summary.receipt == null ? 'VOCÊ ESTÁ RECEBENDO' : 'COMPROVANTE DE RECEBIMENTO', style: KxText.label.copyWith(color: KxColors.cyberCyan)),
+      Text(summary.receipt == null ? 'VOCÊ ESTÁ RECEBENDO' : 'COMPROVANTE DE RECEBIMENTO',
+          style: KxText.label.copyWith(color: KxColors.cyberCyan)),
       const SizedBox(height: 4),
       Text(s.description, style: KxText.h1),
       const SizedBox(height: 4),
-      Text('Carga ${s.code} · ${s.origin} → ${s.destination}${s.vehiclePlate == null ? '' : ' · Veículo ${s.vehiclePlate}'}', style: KxText.body),
+      Text('Carga ${s.code} · ${s.origin} → ${s.destination}${s.vehiclePlate == null ? '' : ' · Veículo ${s.vehiclePlate}'}',
+          style: KxText.body),
       if (s.recipientName != null) Text('Destinatário: ${s.recipientName}', style: KxText.body),
     ]);
   }
@@ -97,9 +99,14 @@ class _Verdict extends StatelessWidget {
     final (title, text) = switch (s.integrity) {
       Integrity.ok => (
           'A carga chegou sem problemas',
-          n == 0 ? 'Nada de errado foi registrado na viagem. Confira a embalagem e aprove.' : 'Só ocorrências muito leves. Confira a embalagem e aprove.'
+          n == 0
+              ? 'Nada de errado foi registrado na viagem. Confira a embalagem e aprove.'
+              : 'Só ocorrências muito leves. Confira a embalagem e aprove.'
         ),
-      Integrity.attention => ('Confira antes de aprovar', 'Houve $n ${n == 1 ? 'ocorrência' : 'ocorrências'} na viagem. Veja abaixo e confira a embalagem.'),
+      Integrity.attention => (
+          'Confira antes de aprovar',
+          'Houve $n ${n == 1 ? 'ocorrência' : 'ocorrências'} na viagem. Veja abaixo e confira a embalagem.'
+        ),
       Integrity.problem => ('Atenção: possível dano', 'A carga teve ocorrências graves. Abra e confira o conteúdo antes de aprovar.'),
     };
     return KxCard(
@@ -131,7 +138,10 @@ class _Journey extends StatelessWidget {
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Icon(i, size: 18, color: c ?? KxColors.cyberCyan),
             const SizedBox(height: 4),
-            FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: Text(value, style: KxText.metric(c ?? KxColors.textDisplay).copyWith(fontSize: 16), maxLines: 1)),
+            FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(value, style: KxText.metric(c ?? KxColors.textDisplay).copyWith(fontSize: 16), maxLines: 1)),
             Text(label, style: KxText.body.copyWith(fontSize: 12)),
           ]),
         );
@@ -141,8 +151,11 @@ class _Journey extends StatelessWidget {
         const SectionTitle('Resumo da viagem'),
         Row(children: [
           stat(Icons.schedule_rounded, 'de viagem', s.startedAt == null ? '—' : Fmt.duration(end.difference(s.startedAt!))),
-          stat(Icons.thermostat_rounded, 'faixa ${Fmt.num(s.limits.tempMin, 0)}–${Fmt.num(s.limits.tempMax, 0)} °C',
-              summary.tempMin == null ? '—' : '${Fmt.num(summary.tempMin)}–${Fmt.num(summary.tempMax)} °C', tempOk ? null : KxColors.talpaLava),
+          stat(
+              Icons.thermostat_rounded,
+              'faixa ${Fmt.num(s.limits.tempMin, 0)}–${Fmt.num(s.limits.tempMax, 0)} °C',
+              summary.tempMin == null ? '—' : '${Fmt.num(summary.tempMin)}–${Fmt.num(summary.tempMax)} °C',
+              tempOk ? null : KxColors.talpaLava),
           stat(Icons.vibration_rounded, 'maior solavanco', summary.peakG == null ? '—' : '${Fmt.num(summary.peakG)} G'),
         ]),
         const SizedBox(height: KxSpace.lg),

@@ -66,7 +66,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           icon: const Icon(Icons.qr_code_scanner_rounded),
           label: const Text('Recebi uma carga: ler QR Code'),
         ),
-        if (isDemo) ...[const SizedBox(height: KxSpace.xl), _DemoAccess(busy: _busy, onPick: (e) => _submit(email: e, password: 'kinetix'))],
+        if (isDemo) ...[
+          const SizedBox(height: KxSpace.xl),
+          _DemoAccess(busy: _busy, onPick: (e) => _submit(email: e, password: 'kinetix'))
+        ],
       ]),
       child: AutofillGroup(
         child: Form(
@@ -133,11 +136,14 @@ class _DemoAccess extends StatelessWidget {
       Wrap(spacing: KxSpace.sm, runSpacing: KxSpace.sm, alignment: WrapAlignment.center, children: [
         for (final e in DemoRepository.demoUsers.entries.where((e) => e.value.$2 != UserRole.destinatario))
           ActionChip(
-            avatar: Icon(switch (e.value.$2) {
-              UserRole.admin => Icons.admin_panel_settings_outlined,
-              UserRole.gestor => Icons.insights_outlined,
-              _ => Icons.local_shipping_outlined,
-            }, size: 18, color: KxColors.cyberCyan),
+            avatar: Icon(
+                switch (e.value.$2) {
+                  UserRole.admin => Icons.admin_panel_settings_outlined,
+                  UserRole.gestor => Icons.insights_outlined,
+                  _ => Icons.local_shipping_outlined,
+                },
+                size: 18,
+                color: KxColors.cyberCyan),
             label: Text(e.value.$2.label),
             onPressed: busy ? null : () => onPick(e.key),
           ),

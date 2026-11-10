@@ -62,8 +62,8 @@ class DemoRepository extends KinetixRepository {
       _sims[id] = TelemetrySimulator(deviceId: id, scripted: false, seed: 11 + i, baseTemp: 21.5 + i * 1.5, start: _now);
     }
 
-    Shipment s(String id, String code, String desc, String cat, String from, String to, String? device,
-            ShipmentStatus status, double score, String plate, String recipient,
+    Shipment s(String id, String code, String desc, String cat, String from, String to, String? device, ShipmentStatus status, double score,
+            String plate, String recipient,
             {Duration? started, Duration? delivered, CargoLimits limits = const CargoLimits(), String? driverId}) =>
         Shipment(
           id: id,
@@ -88,12 +88,13 @@ class DemoRepository extends KinetixRepository {
     final list = [
       s('s1', 'TC-8902', 'Vacinas termossensíveis', 'Farmacêutico', 'São José dos Campos-SP', 'Taubaté-SP', 'kx-01',
           ShipmentStatus.inTransit, 100, 'FKT-3B21', 'Hospital Regional de Taubaté',
-          started: const Duration(minutes: 48), driverId: driver),
-      s('s2', 'TC-7741', 'Servidores e placas eletrônicas', 'Eletrônicos', 'Jacareí-SP', 'Caçapava-SP', 'kx-02',
+          started: const Duration(minutes: 12), driverId: driver),
+      s('s2', 'TC-7741', 'Servidores e placas eletrônicas', 'Eletrônicos', 'São José dos Campos-SP', 'Taubaté-SP', 'kx-02',
           ShipmentStatus.inTransit, 100, 'GHT-9A10', 'Data Center Vale',
-          started: const Duration(minutes: 22), limits: CargoCategory.all[3].limits),
-      s('s3', 'TC-6610', 'Lentes ópticas de precisão', 'Óptico', 'Taubaté-SP', 'São Paulo-SP', 'kx-03',
-          ShipmentStatus.preparing, 100, 'BRA-2E19', 'Óptica Paulista', limits: CargoCategory.all[4].limits),
+          started: const Duration(minutes: 20), limits: CargoCategory.all[3].limits),
+      s('s3', 'TC-6610', 'Lentes ópticas de precisão', 'Óptico', 'São José dos Campos-SP', 'Taubaté-SP', 'kx-03', ShipmentStatus.preparing,
+          100, 'BRA-2E19', 'Óptica Paulista',
+          limits: CargoCategory.all[4].limits),
       s('s4', 'TC-5120', 'Medicamentos controlados', 'Farmacêutico', 'São José dos Campos-SP', 'Caçapava-SP', null,
           ShipmentStatus.delivered, 87, 'FKT-3B21', 'Farmácia Central',
           started: const Duration(hours: 28), delivered: const Duration(hours: 26), driverId: driver),
@@ -102,13 +103,15 @@ class DemoRepository extends KinetixRepository {
       _shipments[sh.id] = sh;
     }
 
-    // histórico da carga s1: 45 min de leituras e duas ocorrências passadas
-    _prefillReadings('s1', 'kx-01', const Duration(minutes: 45));
+    // histórico: o caminhão da s1 saiu há 12 min e o da s2 há 20 min (na mesma estrada)
+    _prefillReadings('s1', 'kx-01', const Duration(minutes: 12));
     _prefillReadings('s2', 'kx-02', const Duration(minutes: 20));
+    _sims['kx-03']!.driving = false; // carga s3 ainda não saiu
     final s1 = _shipments['s1']!;
     final pastImpact = _readings['s1']![(_readings['s1']!.length * 0.35).round()];
     final pastHum = _readings['s1']![(_readings['s1']!.length * 0.7).round()];
-    _addPastEvent(s1, pastImpact, EventType.impact, Severity.warning, 'Impacto forte', 'A caixa sofreu um solavanco de 3,2 G.', 3.2, 10, 90);
+    _addPastEvent(
+        s1, pastImpact, EventType.impact, Severity.warning, 'Impacto forte', 'A caixa sofreu um solavanco de 3,2 G.', 3.2, 10, 90);
     _addPastEvent(s1, pastHum, EventType.humidity, Severity.warning, 'Umidade alta',
         'O ar dentro da caixa chegou a 84% de umidade (máximo 80%).', 84, 3, 87);
     _shipments['s1'] = s1.copyWith(score: 87);
@@ -143,9 +146,13 @@ class DemoRepository extends KinetixRepository {
     }
   }
 
+  /// Roda o simulador da caixa [back] para trás no tempo, guardando o histórico.
+  /// O mesmo simulador continua ao vivo depois, então o trajeto não dá saltos.
   void _prefillReadings(String shipmentId, String deviceId, Duration back) {
-    final sim = TelemetrySimulator(deviceId: deviceId, scripted: false, seed: deviceId.hashCode, start: _now.subtract(back),
-        baseTemp: _sims[deviceId]!.baseTemp);
+    final old = _sims[deviceId]!;
+    final sim =
+        TelemetrySimulator(deviceId: deviceId, scripted: false, seed: old.hashCode, baseTemp: old.baseTemp, start: _now.subtract(back));
+    _sims[deviceId] = sim;
     final list = <Telemetry>[];
     for (var i = 0; i < back.inSeconds; i++) {
       final t = sim.next();
@@ -154,8 +161,8 @@ class DemoRepository extends KinetixRepository {
     _readings[shipmentId] = list;
   }
 
-  void _addPastEvent(Shipment s, Telemetry at, EventType type, Severity sev, String title, String detail, double value,
-      double penalty, double after) {
+  void _addPastEvent(
+      Shipment s, Telemetry at, EventType type, Severity sev, String title, String detail, double value, double penalty, double after) {
     _events.add(CargoEvent(
       id: _eventId++,
       shipmentId: s.id,
@@ -268,8 +275,7 @@ class DemoRepository extends KinetixRepository {
     final e = email.trim().toLowerCase();
     if (!e.contains('@')) throw const KxException('Digite um e-mail válido, como nome@empresa.com.');
     if (password.length < 6) throw const KxException('A senha precisa ter pelo menos 6 caracteres.');
-    _me = _profiles.values.where((p) => p.email == e).firstOrNull ??
-        _register(e.split('@').first, e, UserRole.gestor);
+    _me = _profiles.values.where((p) => p.email == e).firstOrNull ?? _register(e.split('@').first, e, UserRole.gestor);
     _emit();
   }
 
@@ -321,8 +327,7 @@ class DemoRepository extends KinetixRepository {
 
   @override
   Stream<List<Shipment>> watchShipments() => _watch(() {
-        final l = _shipments.values.where(_canSee).toList()
-          ..sort((a, b) => (b.createdAt ?? _now).compareTo(a.createdAt ?? _now));
+        final l = _shipments.values.where(_canSee).toList()..sort((a, b) => (b.createdAt ?? _now).compareTo(a.createdAt ?? _now));
         return l;
       });
 
@@ -334,8 +339,7 @@ class DemoRepository extends KinetixRepository {
     if (_shipments.values.any((s) => s.code == code && s.id != editingId)) {
       throw KxException('Já existe uma carga com o código $code.');
     }
-    if (d.deviceId != null &&
-        _shipments.values.any((s) => s.deviceId == d.deviceId && s.status.isActive && s.id != editingId)) {
+    if (d.deviceId != null && _shipments.values.any((s) => s.deviceId == d.deviceId && s.status.isActive && s.id != editingId)) {
       throw KxException('A ${_devices[d.deviceId]?.name ?? d.deviceId} já está em outra carga ativa.');
     }
   }
@@ -388,6 +392,7 @@ class DemoRepository extends KinetixRepository {
     final s = _shipments[id]!;
     if (s.status != ShipmentStatus.preparing) return;
     _shipments[id] = s.copyWith(status: ShipmentStatus.inTransit, startedAt: _now);
+    if (s.deviceId != null) _sims[s.deviceId!]?.startTrip();
     _engines[id] = ScoreEngine(limits: s.limits, score: s.score);
     _emit();
   }
@@ -403,9 +408,7 @@ class DemoRepository extends KinetixRepository {
   @override
   Stream<List<CargoEvent>> watchAlerts() => _watch(() {
         final visible = _shipments.values.where(_canSee).map((s) => s.id).toSet();
-        final l = _events
-            .where((e) => visible.contains(e.shipmentId) && !e.isAcknowledged && e.severity != Severity.info)
-            .toList()
+        final l = _events.where((e) => visible.contains(e.shipmentId) && !e.isAcknowledged && e.severity != Severity.info).toList()
           ..sort((a, b) => b.ts.compareTo(a.ts));
         return l;
       });
@@ -504,7 +507,8 @@ class DemoRepository extends KinetixRepository {
     if (s.status.isClosed) throw const KxException('Esta carga já foi recebida.');
     if (signer.trim().isEmpty) throw const KxException('Informe o nome de quem está recebendo.');
     final note = (notes ?? '').trim();
-    _receipts[s.id] = Receipt(signerName: signer.trim(), approved: approved, signedAt: _now, signatureSvg: signatureSvg, notes: note.isEmpty ? null : note);
+    _receipts[s.id] = Receipt(
+        signerName: signer.trim(), approved: approved, signedAt: _now, signatureSvg: signatureSvg, notes: note.isEmpty ? null : note);
     _shipments[s.id] = s.copyWith(status: approved ? ShipmentStatus.delivered : ShipmentStatus.refused, deliveredAt: _now);
     _engines.remove(s.id);
     _events.add(CargoEvent(

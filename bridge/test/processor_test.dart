@@ -15,8 +15,7 @@ class FakeStore implements BridgeStore {
   @override
   Future<ActiveShipment?> activeShipment(String deviceId) async => shipment;
   @override
-  Future<void> upsertDevice(String deviceId, Map<String, dynamic> fields) async =>
-      devices[deviceId] = {...?devices[deviceId], ...fields};
+  Future<void> upsertDevice(String deviceId, Map<String, dynamic> fields) async => devices[deviceId] = {...?devices[deviceId], ...fields};
   @override
   Future<void> insertReadings(List<Map<String, dynamic>> rows) async => readings.addAll(rows);
   @override

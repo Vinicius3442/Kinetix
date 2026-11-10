@@ -193,10 +193,18 @@ class _ShipmentFormScreenState extends ConsumerState<ShipmentFormScreen> {
             KxCard(
               child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                 const SectionTitle('A carga'),
-                TextFormField(controller: _desc, decoration: const InputDecoration(labelText: 'O que está sendo levado', hintText: 'Ex.: Vacinas termossensíveis'), validator: req),
+                TextFormField(
+                    controller: _desc,
+                    decoration: const InputDecoration(labelText: 'O que está sendo levado', hintText: 'Ex.: Vacinas termossensíveis'),
+                    validator: req),
                 const SizedBox(height: KxSpace.md),
                 Row(children: [
-                  Expanded(child: TextFormField(controller: _code, decoration: const InputDecoration(labelText: 'Código'), textCapitalization: TextCapitalization.characters, validator: req)),
+                  Expanded(
+                      child: TextFormField(
+                          controller: _code,
+                          decoration: const InputDecoration(labelText: 'Código'),
+                          textCapitalization: TextCapitalization.characters,
+                          validator: req)),
                   const SizedBox(width: KxSpace.md),
                   Expanded(
                     child: DropdownButtonFormField<String>(
@@ -241,13 +249,18 @@ class _ShipmentFormScreenState extends ConsumerState<ShipmentFormScreen> {
             KxCard(
               child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                 const SectionTitle('A viagem'),
-                TextFormField(controller: _origin, decoration: const InputDecoration(labelText: 'Saindo de', hintText: 'Cidade-UF'), validator: req),
+                TextFormField(
+                    controller: _origin, decoration: const InputDecoration(labelText: 'Saindo de', hintText: 'Cidade-UF'), validator: req),
                 const SizedBox(height: KxSpace.md),
-                TextFormField(controller: _dest, decoration: const InputDecoration(labelText: 'Indo para', hintText: 'Cidade-UF'), validator: req),
+                TextFormField(
+                    controller: _dest, decoration: const InputDecoration(labelText: 'Indo para', hintText: 'Cidade-UF'), validator: req),
                 const SizedBox(height: KxSpace.md),
                 TextFormField(controller: _recipient, decoration: const InputDecoration(labelText: 'Quem vai receber (opcional)')),
                 const SizedBox(height: KxSpace.md),
-                TextFormField(controller: _plate, decoration: const InputDecoration(labelText: 'Placa do veículo (opcional)'), textCapitalization: TextCapitalization.characters),
+                TextFormField(
+                    controller: _plate,
+                    decoration: const InputDecoration(labelText: 'Placa do veículo (opcional)'),
+                    textCapitalization: TextCapitalization.characters),
               ]),
             ),
             const SizedBox(height: KxSpace.md),

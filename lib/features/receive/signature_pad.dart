@@ -79,7 +79,8 @@ class SignaturePad extends StatelessWidget {
       Row(children: [
         if (hasError) Text('Falta a assinatura.', style: KxText.body.copyWith(color: KxColors.talpaLava, fontSize: 12)),
         const Spacer(),
-        TextButton.icon(onPressed: controller.clear, icon: const Icon(Icons.refresh_rounded, size: 18), label: const Text('Limpar assinatura')),
+        TextButton.icon(
+            onPressed: controller.clear, icon: const Icon(Icons.refresh_rounded, size: 18), label: const Text('Limpar assinatura')),
       ]),
     ]);
   }

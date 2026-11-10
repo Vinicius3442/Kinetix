@@ -35,9 +35,7 @@ abstract final class Fmt {
     return m == 0 ? '${d.inHours} h' : '${d.inHours} h $m min';
   }
 
-  static String num(double? v, [int places = 1]) =>
-      v == null ? '—' : v.toStringAsFixed(places).replaceAll('.', ',');
+  static String num(double? v, [int places = 1]) => v == null ? '—' : v.toStringAsFixed(places).replaceAll('.', ',');
 
-  static String coords(double? lat, double? lng) =>
-      lat == null || lng == null ? 'sem localização' : '${num(lat, 4)}, ${num(lng, 4)}';
+  static String coords(double? lat, double? lng) => lat == null || lng == null ? 'sem localização' : '${num(lat, 4)}, ${num(lng, 4)}';
 }

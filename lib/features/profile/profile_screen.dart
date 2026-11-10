@@ -59,7 +59,8 @@ class ProfileScreen extends ConsumerWidget {
               padding: const EdgeInsets.all(KxSpace.sm),
               child: Column(children: [
                 tile(Icons.edit_outlined, 'Editar meus dados', 'Nome, telefone e empresa', () => _edit(context, ref, me)),
-                tile(Icons.school_outlined, 'Rever o tutorial', 'Como o Kinetix funciona, em 3 passos', () => context.go(Routes.onboarding)),
+                tile(
+                    Icons.school_outlined, 'Rever o tutorial', 'Como o Kinetix funciona, em 3 passos', () => context.go(Routes.onboarding)),
                 tile(Icons.info_outline_rounded, 'O que posso fazer', me.role.description, null),
               ]),
             ),
@@ -125,7 +126,8 @@ class ProfileScreen extends ConsumerWidget {
               validator: (v) => (v ?? '').trim().length < 3 ? 'Digite o seu nome.' : null,
             ),
             const SizedBox(height: KxSpace.md),
-            TextFormField(controller: phone, decoration: const InputDecoration(labelText: 'Telefone (opcional)'), keyboardType: TextInputType.phone),
+            TextFormField(
+                controller: phone, decoration: const InputDecoration(labelText: 'Telefone (opcional)'), keyboardType: TextInputType.phone),
             const SizedBox(height: KxSpace.md),
             TextFormField(controller: company, decoration: const InputDecoration(labelText: 'Empresa (opcional)')),
             const SizedBox(height: KxSpace.xl),

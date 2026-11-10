@@ -39,7 +39,8 @@ class EventTile extends StatelessWidget {
               Container(
                 width: 32,
                 height: 32,
-                decoration: BoxDecoration(color: c.withValues(alpha: 0.12), shape: BoxShape.circle, border: Border.all(color: c.withValues(alpha: 0.5))),
+                decoration: BoxDecoration(
+                    color: c.withValues(alpha: 0.12), shape: BoxShape.circle, border: Border.all(color: c.withValues(alpha: 0.5))),
                 child: Icon(eventIcon(e.type), size: 17, color: c),
               ),
               if (showLine) Expanded(child: Container(width: 1, color: KxColors.borderSlate)),
@@ -50,7 +51,9 @@ class EventTile extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: KxSpace.sm),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(children: [
-                    Flexible(child: Text(e.title, style: KxText.h3.copyWith(fontSize: 15, color: e.severity == Severity.info ? KxColors.textDisplay : c))),
+                    Flexible(
+                        child: Text(e.title,
+                            style: KxText.h3.copyWith(fontSize: 15, color: e.severity == Severity.info ? KxColors.textDisplay : c))),
                     if (e.penalty > 0) ...[
                       const SizedBox(width: 6),
                       Text('−${e.penalty.round()}', style: KxText.log.copyWith(color: c, fontWeight: FontWeight.w700)),

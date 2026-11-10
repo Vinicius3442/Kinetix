@@ -55,7 +55,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           if (_error != null) ...[FormMessage(_error!), const SizedBox(height: KxSpace.lg)],
           if (_sent) ...[
-            FormMessage('Pronto! Se existir uma conta com ${_email.text.trim()}, o link chega em alguns minutos. Confira também a caixa de spam.', success: true),
+            FormMessage(
+                'Pronto! Se existir uma conta com ${_email.text.trim()}, o link chega em alguns minutos. Confira também a caixa de spam.',
+                success: true),
             const SizedBox(height: KxSpace.lg),
             FilledButton(onPressed: back, child: const Text('Voltar para entrar')),
           ] else ...[

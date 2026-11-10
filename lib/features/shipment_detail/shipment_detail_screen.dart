@@ -11,7 +11,9 @@ import '../../core/utils/format.dart';
 import '../../core/widgets/kx_widgets.dart';
 import '../../data/models/models.dart';
 import '../../data/providers.dart';
+import '../map/cargo_map.dart';
 import '../timeline/event_tile.dart';
+import '../timeline/timeline_screen.dart';
 import '../twin/digital_twin.dart';
 import 'cargo_readout.dart';
 import 'qr_sheet.dart';
@@ -28,6 +30,8 @@ class ShipmentDetailScreen extends ConsumerStatefulWidget {
 
 class _ShipmentDetailScreenState extends ConsumerState<ShipmentDetailScreen> {
   final _temps = <double>[];
+  final _trail = <Telemetry>[]; // posições para o mapa
+  bool _trailLoaded = false;
   Telemetry? _last;
   Timer? _clock;
 
@@ -49,6 +53,11 @@ class _ShipmentDetailScreenState extends ConsumerState<ShipmentDetailScreen> {
   void _onTelemetry(Telemetry t) {
     if (_last != null && t.ts.isBefore(_last!.ts)) return;
     _last = t;
+    if (t.hasLocation) {
+      final prev = _trail.lastOrNull;
+      if (prev == null || DemoRoute.distanceMeters(prev.lat!, prev.lng!, t.lat!, t.lng!) > 15) _trail.add(t);
+      if (_trail.length > 3000) _trail.removeAt(0);
+    }
     if (t.temp != null) {
       _temps.add(t.temp!);
       if (_temps.length > 90) _temps.removeAt(0);
@@ -79,13 +88,19 @@ class _ShipmentDetailScreenState extends ConsumerState<ShipmentDetailScreen> {
     final me = ref.watch(sessionProvider).value;
     final repo = ref.watch(repositoryProvider);
     final events = ref.watch(eventsProvider(s.id)).value ?? const <CargoEvent>[];
-    final device = s.deviceId == null ? null : (ref.watch(devicesProvider).value ?? const <Device>[]).where((d) => d.id == s.deviceId).firstOrNull;
+    final device =
+        s.deviceId == null ? null : (ref.watch(devicesProvider).value ?? const <Device>[]).where((d) => d.id == s.deviceId).firstOrNull;
 
     // histórico inicial do gráfico
     final readings = ref.watch(readingsProvider(s.id)).value;
     if (_temps.isEmpty && readings != null) {
       _temps.addAll(readings.map((r) => r.temp).whereType<double>().toList().reversed.take(90).toList().reversed);
       if (readings.isNotEmpty) _last ??= readings.last;
+    }
+    if (!_trailLoaded && readings != null) {
+      _trailLoaded = true;
+      final firstLive = _trail.firstOrNull?.ts;
+      _trail.insertAll(0, readings.where((r) => r.hasLocation && (firstLive == null || r.ts.isBefore(firstLive))));
     }
     if (s.deviceId != null && s.status.isActive) {
       ref.listen(liveTelemetryProvider(s.deviceId!), (_, next) {
@@ -105,6 +120,25 @@ class _ShipmentDetailScreenState extends ConsumerState<ShipmentDetailScreen> {
     final score = _ScoreCard(shipment: s, events: events);
     final sensors = readout == null ? _NoData(shipment: s) : _SensorGrid(readout: readout, temps: _temps, events: events, wide: wide);
     final recent = _RecentEvents(shipment: s, events: events);
+    final showMap = s.status.isActive || _trail.isNotEmpty;
+    final map = KxCard(
+      padding: const EdgeInsets.all(KxSpace.md),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        SectionTitle(s.status == ShipmentStatus.inTransit ? 'Onde está a carga' : 'Trajeto'),
+        if (s.status == ShipmentStatus.inTransit) ...[
+          TripProgress(current: t, destination: s.destination),
+          const SizedBox(height: KxSpace.md),
+        ],
+        CargoMap(
+          trail: _trail,
+          current: s.status == ShipmentStatus.inTransit ? t : null,
+          events: events,
+          live: s.status == ShipmentStatus.inTransit,
+          height: wide ? 340 : 280,
+          onEventTap: (e) => showEventSheet(context, ref, s, e),
+        ),
+      ]),
+    );
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -120,10 +154,13 @@ class _ShipmentDetailScreenState extends ConsumerState<ShipmentDetailScreen> {
           Text(s.description, style: KxText.h3, overflow: TextOverflow.ellipsis),
         ]),
         actions: [
-          IconButton(tooltip: 'QR Code de recebimento', icon: const Icon(Icons.qr_code_2_rounded), onPressed: () => showQrSheet(context, s)),
-          IconButton(tooltip: 'Histórico e mapa', icon: const Icon(Icons.timeline_rounded), onPressed: () => context.go(Routes.timeline(s.id))),
+          IconButton(
+              tooltip: 'QR Code de recebimento', icon: const Icon(Icons.qr_code_2_rounded), onPressed: () => showQrSheet(context, s)),
+          IconButton(
+              tooltip: 'Histórico e mapa', icon: const Icon(Icons.timeline_rounded), onPressed: () => context.go(Routes.timeline(s.id))),
           if (me?.role.isStaff ?? false)
-            IconButton(tooltip: 'Editar carga', icon: const Icon(Icons.edit_outlined), onPressed: () => context.go(Routes.editShipment(s.id))),
+            IconButton(
+                tooltip: 'Editar carga', icon: const Icon(Icons.edit_outlined), onPressed: () => context.go(Routes.editShipment(s.id))),
           const SizedBox(width: KxSpace.sm),
         ],
       ),
@@ -148,6 +185,7 @@ class _ShipmentDetailScreenState extends ConsumerState<ShipmentDetailScreen> {
               const SizedBox(height: KxSpace.md),
               sensors,
             ],
+            if (showMap) ...[const SizedBox(height: KxSpace.md), map],
             if (repo.isDemo && s.status == ShipmentStatus.inTransit && s.deviceId != null) ...[
               const SizedBox(height: KxSpace.md),
               _DemoControls(deviceId: s.deviceId!),
@@ -173,15 +211,19 @@ class _RouteHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final s = shipment;
     return Wrap(spacing: KxSpace.md, runSpacing: KxSpace.sm, crossAxisAlignment: WrapCrossAlignment.center, children: [
-      Text.rich(TextSpan(children: [
-        const WidgetSpan(alignment: PlaceholderAlignment.middle, child: Icon(Icons.trip_origin, size: 14, color: KxColors.cyberCyan)),
-        TextSpan(text: '  ${s.origin}  '),
-        const WidgetSpan(alignment: PlaceholderAlignment.middle, child: Icon(Icons.arrow_forward_rounded, size: 16, color: KxColors.textLog)),
-        const TextSpan(text: '  '),
-        const WidgetSpan(alignment: PlaceholderAlignment.middle, child: Icon(Icons.place, size: 15, color: KxColors.talpaLava)),
-        TextSpan(text: ' ${s.destination}'),
-      ]), style: KxText.body.copyWith(color: KxColors.textSection)),
-      StatusPill(label: s.status.label, color: s.status.isActive ? KxColors.cyberCyan : KxColors.textBody, icon: Icons.local_shipping_outlined),
+      Text.rich(
+          TextSpan(children: [
+            const WidgetSpan(alignment: PlaceholderAlignment.middle, child: Icon(Icons.trip_origin, size: 14, color: KxColors.cyberCyan)),
+            TextSpan(text: '  ${s.origin}  '),
+            const WidgetSpan(
+                alignment: PlaceholderAlignment.middle, child: Icon(Icons.arrow_forward_rounded, size: 16, color: KxColors.textLog)),
+            const TextSpan(text: '  '),
+            const WidgetSpan(alignment: PlaceholderAlignment.middle, child: Icon(Icons.place, size: 15, color: KxColors.talpaLava)),
+            TextSpan(text: ' ${s.destination}'),
+          ]),
+          style: KxText.body.copyWith(color: KxColors.textSection)),
+      StatusPill(
+          label: s.status.label, color: s.status.isActive ? KxColors.cyberCyan : KxColors.textBody, icon: Icons.local_shipping_outlined),
       if (s.vehiclePlate != null) StatusPill(label: s.vehiclePlate!, color: KxColors.textBody, icon: Icons.directions_car_outlined),
     ]);
   }
@@ -311,7 +353,10 @@ class _ScoreCard extends StatelessWidget {
   void _explain(BuildContext context) {
     Widget row(String what, String pts) => Padding(
           padding: const EdgeInsets.symmetric(vertical: 4),
-          child: Row(children: [Expanded(child: Text(what, style: KxText.body)), Text(pts, style: KxText.log.copyWith(color: KxColors.talpaLava))]),
+          child: Row(children: [
+            Expanded(child: Text(what, style: KxText.body)),
+            Text(pts, style: KxText.log.copyWith(color: KxColors.talpaLava))
+          ]),
         );
     showDialog(
       context: context,
@@ -327,7 +372,8 @@ class _ScoreCard extends StatelessWidget {
             row('Temperatura fora da faixa (crítica: mais 5)', '−5'),
             row('Umidade alta', '−3'),
             const SizedBox(height: KxSpace.md),
-            Text('90 a 100: Carga OK · 70 a 89: Atenção · abaixo de 70: Problema', style: KxText.body.copyWith(color: KxColors.textSection)),
+            Text('90 a 100: Carga OK · 70 a 89: Atenção · abaixo de 70: Problema',
+                style: KxText.body.copyWith(color: KxColors.textSection)),
           ]),
         ),
         actions: [FilledButton(onPressed: () => Navigator.pop(ctx), child: const Text('Entendi'))],
@@ -469,7 +515,8 @@ class _StartCard extends ConsumerWidget {
           FilledButton.icon(
             onPressed: shipment.deviceId == null
                 ? null
-                : () => runAction(context, () => ref.read(repositoryProvider).startShipment(shipment.id), success: 'Viagem iniciada. Boa estrada!'),
+                : () => runAction(context, () => ref.read(repositoryProvider).startShipment(shipment.id),
+                    success: 'Viagem iniciada. Boa estrada!'),
             icon: const Icon(Icons.play_arrow_rounded),
             label: const Text('Iniciar viagem'),
           ),
@@ -522,11 +569,26 @@ class _DemoControls extends ConsumerWidget {
         Text('Provoque um evento na caixa para ver o gêmeo, os alertas e a nota reagirem.', style: KxText.body),
         const SizedBox(height: KxSpace.md),
         Wrap(spacing: KxSpace.sm, runSpacing: KxSpace.sm, children: [
-          ActionChip(avatar: const Icon(Icons.vibration_rounded, size: 18), label: const Text('Impacto'), onPressed: () => sim(SimIncident.impact, 'Impacto enviado.')),
-          ActionChip(avatar: const Icon(Icons.screen_rotation_alt_rounded, size: 18), label: const Text('Inclinar'), onPressed: () => sim(SimIncident.tilt, 'Inclinando a caixa…')),
-          ActionChip(avatar: const Icon(Icons.light_mode_rounded, size: 18), label: const Text('Abrir caixa'), onPressed: () => sim(SimIncident.opening, 'Abrindo a caixa…')),
-          ActionChip(avatar: const Icon(Icons.thermostat_rounded, size: 18), label: const Text('Esquentar'), onPressed: () => sim(SimIncident.heat, 'Temperatura subindo…')),
-          ActionChip(avatar: const Icon(Icons.signal_wifi_off_rounded, size: 18), label: const Text('Perder sinal'), onPressed: () => sim(SimIncident.signalLoss, 'Caixa sem sinal por 12 s.')),
+          ActionChip(
+              avatar: const Icon(Icons.vibration_rounded, size: 18),
+              label: const Text('Impacto'),
+              onPressed: () => sim(SimIncident.impact, 'Impacto enviado.')),
+          ActionChip(
+              avatar: const Icon(Icons.screen_rotation_alt_rounded, size: 18),
+              label: const Text('Inclinar'),
+              onPressed: () => sim(SimIncident.tilt, 'Inclinando a caixa…')),
+          ActionChip(
+              avatar: const Icon(Icons.light_mode_rounded, size: 18),
+              label: const Text('Abrir caixa'),
+              onPressed: () => sim(SimIncident.opening, 'Abrindo a caixa…')),
+          ActionChip(
+              avatar: const Icon(Icons.thermostat_rounded, size: 18),
+              label: const Text('Esquentar'),
+              onPressed: () => sim(SimIncident.heat, 'Temperatura subindo…')),
+          ActionChip(
+              avatar: const Icon(Icons.signal_wifi_off_rounded, size: 18),
+              label: const Text('Perder sinal'),
+              onPressed: () => sim(SimIncident.signalLoss, 'Caixa sem sinal por 12 s.')),
         ]),
       ]),
     );

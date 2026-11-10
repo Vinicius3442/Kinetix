@@ -12,8 +12,8 @@
  *   LEDs     (26 verde, 27 vermelho) → sinalização rápida para o entregador
  *   Botão    (pino 4)   → simula perda de sinal (demonstra o buffer offline)
  *
- * O Wokwi não tem módulo GPS: a posição é simulada ao longo da Via Dutra
- * (São José dos Campos → Taubaté), igual ao simulador do app.
+ * O Wokwi não tem módulo GPS: a posição percorre o traçado real da Via Dutra
+ * (São José dos Campos → Taubaté) em 30 min, igual ao simulador do app.
  *
  * Contrato MQTT v1 (ver packages/kinetix_core/lib/src/telemetry.dart):
  *   publica  kinetix/v1/<DEVICE_ID>/telemetry   JSON a cada 1 s
@@ -37,7 +37,7 @@
 // 1. CONFIGURAÇÃO
 // -----------------------------------------------------------------------------
 #define DEVICE_ID        "kx-01"
-#define FIRMWARE_VERSION "esp32-wokwi 2.0"
+#define FIRMWARE_VERSION "esp32-wokwi 2.1"
 
 // No Wokwi a rede é sempre "Wokwi-GUEST", sem senha.
 #define WIFI_SSID        "Wokwi-GUEST"
@@ -106,12 +106,83 @@ unsigned long lastSample = 0, lastPublish = 0, lastDht = 0, lastMqttTry = 0, las
 String offlineBuffer[BUFFER_SIZE];
 int bufHead = 0, bufCount = 0;
 
-// Rota simulada (Wokwi não tem GPS)
+// Rota simulada (Wokwi não tem GPS): traçado real da Rod. Pres. Dutra,
+// São José dos Campos → Taubaté (~41,5 km), vindo do OpenStreetMap.
+// O caminhão percorre em 30 min (~83 km/h) e fica parado no destino.
 const float ROUTE[][2] = {
-  {-23.1896, -45.8841}, {-23.1712, -45.8392}, {-23.1418, -45.7896}, {-23.1004, -45.7072},
-  {-23.0689, -45.6425}, {-23.0461, -45.5921}, {-23.0264, -45.5553}};
+  {-23.18960f, -45.88410f},
+  {-23.18748f, -45.88462f},
+  {-23.18681f, -45.88381f},
+  {-23.18669f, -45.88356f},
+  {-23.18621f, -45.88110f},
+  {-23.18621f, -45.88075f},
+  {-23.18644f, -45.87989f},
+  {-23.18656f, -45.87972f},
+  {-23.18853f, -45.87889f},
+  {-23.19033f, -45.87774f},
+  {-23.19293f, -45.87524f},
+  {-23.19104f, -45.87129f},
+  {-23.19349f, -45.86866f},
+  {-23.19423f, -45.86819f},
+  {-23.19564f, -45.86655f},
+  {-23.19583f, -45.86618f},
+  {-23.19583f, -45.86585f},
+  {-23.19569f, -45.86572f},
+  {-23.19551f, -45.86569f},
+  {-23.19447f, -45.86591f},
+  {-23.19356f, -45.86632f},
+  {-23.19323f, -45.86632f},
+  {-23.19280f, -45.86608f},
+  {-23.19224f, -45.86537f},
+  {-23.18838f, -45.85756f},
+  {-23.18765f, -45.85579f},
+  {-23.18229f, -45.84516f},
+  {-23.18094f, -45.84200f},
+  {-23.18016f, -45.84039f},
+  {-23.17909f, -45.83835f},
+  {-23.17785f, -45.83658f},
+  {-23.16127f, -45.80349f},
+  {-23.14923f, -45.77971f},
+  {-23.13063f, -45.74268f},
+  {-23.11459f, -45.71113f},
+  {-23.11111f, -45.70446f},
+  {-23.11039f, -45.70320f},
+  {-23.10799f, -45.69958f},
+  {-23.10009f, -45.68813f},
+  {-23.08793f, -45.67026f},
+  {-23.08475f, -45.66569f},
+  {-23.08344f, -45.66392f},
+  {-23.08034f, -45.65928f},
+  {-23.07642f, -45.65367f},
+  {-23.07504f, -45.65136f},
+  {-23.07336f, -45.64822f},
+  {-23.06401f, -45.62943f},
+  {-23.06118f, -45.62394f},
+  {-23.06030f, -45.62203f},
+  {-23.05183f, -45.60501f},
+  {-23.04953f, -45.59971f},
+  {-23.04826f, -45.59622f},
+  {-23.04728f, -45.59313f},
+  {-23.04526f, -45.58551f},
+  {-23.04308f, -45.57677f},
+  {-23.04306f, -45.57646f},
+  {-23.04327f, -45.57602f},
+  {-23.04039f, -45.56442f},
+  {-23.03974f, -45.56459f},
+  {-23.03936f, -45.56457f},
+  {-23.03870f, -45.56477f},
+  {-23.03663f, -45.56442f},
+  {-23.03589f, -45.56446f},
+  {-23.03467f, -45.56477f},
+  {-23.03292f, -45.56625f},
+  {-23.02961f, -45.56090f},
+  {-23.02345f, -45.55563f},
+  {-23.02528f, -45.55353f},
+  {-23.02671f, -45.55493f}
+};
 const int ROUTE_LEN = sizeof(ROUTE) / sizeof(ROUTE[0]);
-const float TRIP_SECONDS = 900;
+const float TRIP_SECONDS = 1800;
+float routeCum[ROUTE_LEN];  // metros acumulados até cada ponto
 
 // -----------------------------------------------------------------------------
 // 4. SENSORES
@@ -156,13 +227,27 @@ void readLight() {
   lightPct = constrain(log10f(max(1.0f, lux)) / 4.0f * 100.0f, 0.0f, 100.0f);
 }
 
+float distMeters(float lat1, float lng1, float lat2, float lng2) {
+  const float kx = 111320.0f * cosf(lat1 * PI / 180), ky = 110540.0f;
+  const float dx = (lng2 - lng1) * kx, dy = (lat2 - lat1) * ky;
+  return sqrtf(dx * dx + dy * dy);
+}
+
+void initRoute() {
+  routeCum[0] = 0;
+  for (int i = 1; i < ROUTE_LEN; i++) {
+    routeCum[i] = routeCum[i - 1] + distMeters(ROUTE[i - 1][0], ROUTE[i - 1][1], ROUTE[i][0], ROUTE[i][1]);
+  }
+}
+
+// Posição pela distância percorrida (velocidade constante na estrada)
 void updateGps() {
   const float elapsed = (millis() - bootMs) / 1000.0f;
-  const float lap = fmodf(elapsed, TRIP_SECONDS * 2) / TRIP_SECONDS;
-  const float f = lap <= 1 ? lap : 2 - lap;
-  const float seg = f * (ROUTE_LEN - 1);
-  const int i = min((int)seg, ROUTE_LEN - 2);
-  const float u = seg - i;
+  const float target = min(1.0f, elapsed / TRIP_SECONDS) * routeCum[ROUTE_LEN - 1];
+  int i = 0;
+  while (i < ROUTE_LEN - 2 && routeCum[i + 1] < target) i++;
+  const float seg = routeCum[i + 1] - routeCum[i];
+  const float u = seg > 0 ? (target - routeCum[i]) / seg : 0;
   lat = ROUTE[i][0] + (ROUTE[i + 1][0] - ROUTE[i][0]) * u;
   lng = ROUTE[i][1] + (ROUTE[i + 1][1] - ROUTE[i][1]) * u;
 }
@@ -330,6 +415,7 @@ void updateIndicators() {
 void setup() {
   Serial.begin(115200);
   bootMs = millis();
+  initRoute();
   Serial.println(F("\n=== KINETIX ESP32 ==="));
 
   pinMode(PIN_LED_OK, OUTPUT);

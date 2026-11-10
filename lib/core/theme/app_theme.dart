@@ -7,11 +7,16 @@ const kxMono = 'JetBrainsMono';
 
 /// Tipografia híbrida: Plus Jakarta Sans (interface) + JetBrains Mono (dados).
 abstract final class KxText {
-  static TextStyle get h1 => const TextStyle(fontFamily: kxSans, fontSize: 28, fontWeight: FontWeight.w700, color: KxColors.textDisplay, height: 1.15);
-  static TextStyle get h2 => const TextStyle(fontFamily: kxSans, fontSize: 20, fontWeight: FontWeight.w600, color: KxColors.textSection, height: 1.25);
-  static TextStyle get h3 => const TextStyle(fontFamily: kxSans, fontSize: 16, fontWeight: FontWeight.w600, color: KxColors.textDisplay, height: 1.3);
-  static TextStyle get body => const TextStyle(fontFamily: kxSans, fontSize: 14, fontWeight: FontWeight.w400, color: KxColors.textBody, height: 1.45);
-  static TextStyle get label => const TextStyle(fontFamily: kxSans, fontSize: 12, fontWeight: FontWeight.w600, color: KxColors.textBody, letterSpacing: 0.6);
+  static TextStyle get h1 =>
+      const TextStyle(fontFamily: kxSans, fontSize: 28, fontWeight: FontWeight.w700, color: KxColors.textDisplay, height: 1.15);
+  static TextStyle get h2 =>
+      const TextStyle(fontFamily: kxSans, fontSize: 20, fontWeight: FontWeight.w600, color: KxColors.textSection, height: 1.25);
+  static TextStyle get h3 =>
+      const TextStyle(fontFamily: kxSans, fontSize: 16, fontWeight: FontWeight.w600, color: KxColors.textDisplay, height: 1.3);
+  static TextStyle get body =>
+      const TextStyle(fontFamily: kxSans, fontSize: 14, fontWeight: FontWeight.w400, color: KxColors.textBody, height: 1.45);
+  static TextStyle get label =>
+      const TextStyle(fontFamily: kxSans, fontSize: 12, fontWeight: FontWeight.w600, color: KxColors.textBody, letterSpacing: 0.6);
 
   static TextStyle metric([Color color = KxColors.cyberCyan]) =>
       TextStyle(fontFamily: kxMono, fontSize: 24, fontWeight: FontWeight.w700, color: color, height: 1.1);
@@ -22,9 +27,9 @@ abstract final class KxText {
 ThemeData buildTheme() {
   final base = ThemeData(brightness: Brightness.dark, useMaterial3: true, fontFamily: kxSans);
   final text = base.textTheme.apply(fontFamily: kxSans).apply(
-    bodyColor: KxColors.textSection,
-    displayColor: KxColors.textDisplay,
-  );
+        bodyColor: KxColors.textSection,
+        displayColor: KxColors.textDisplay,
+      );
   const scheme = ColorScheme.dark(
     primary: KxColors.talpaLava,
     onPrimary: Colors.white,
@@ -101,7 +106,8 @@ ThemeData buildTheme() {
       indicatorColor: KxColors.cyberCyan.withValues(alpha: 0.14),
       surfaceTintColor: Colors.transparent,
       height: 68,
-      labelTextStyle: WidgetStateProperty.resolveWith((s) => TextStyle(fontFamily: kxSans, 
+      labelTextStyle: WidgetStateProperty.resolveWith((s) => TextStyle(
+            fontFamily: kxSans,
             fontSize: 12,
             fontWeight: s.contains(WidgetState.selected) ? FontWeight.w700 : FontWeight.w500,
             color: s.contains(WidgetState.selected) ? KxColors.cyberCyan : KxColors.textBody,

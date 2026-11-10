@@ -215,7 +215,9 @@ class KxLogo extends StatelessWidget {
       mark,
       const SizedBox(width: 8),
       Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-        Text('KINETIX', style: TextStyle(fontFamily: kxMono, fontWeight: FontWeight.w700, fontSize: height * 0.48, color: KxColors.textDisplay, letterSpacing: 1.5)),
+        Text('KINETIX',
+            style: TextStyle(
+                fontFamily: kxMono, fontWeight: FontWeight.w700, fontSize: height * 0.48, color: KxColors.textDisplay, letterSpacing: 1.5)),
         if (subtitle != null) Text(subtitle!, style: KxText.log.copyWith(fontSize: 11)),
       ]),
     ]);
@@ -262,7 +264,9 @@ class ErrorView extends StatelessWidget {
         icon: Icons.cloud_off_rounded,
         title: 'Não foi possível carregar',
         message: error is KxException ? error.toString() : 'Verifique a conexão com a internet e tente de novo.',
-        action: onRetry == null ? null : OutlinedButton.icon(onPressed: onRetry, icon: const Icon(Icons.refresh), label: const Text('Tentar de novo')),
+        action: onRetry == null
+            ? null
+            : OutlinedButton.icon(onPressed: onRetry, icon: const Icon(Icons.refresh), label: const Text('Tentar de novo')),
       );
 }
 

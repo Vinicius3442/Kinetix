@@ -24,9 +24,8 @@ Future<void> main(List<String> args) async {
   for (final (i, id) in ids.indexed) {
     sims[id] = TelemetrySimulator(deviceId: id, seed: 7 + i, baseTemp: 21 + i.toDouble());
     buffers[id] = [];
-    final c = await connectMqtt(env,
-        clientId: 'kinetix-sim-$id-${DateTime.now().millisecondsSinceEpoch}',
-        willTopic: KinetixTopics.status(id));
+    final c =
+        await connectMqtt(env, clientId: 'kinetix-sim-$id-${DateTime.now().millisecondsSinceEpoch}', willTopic: KinetixTopics.status(id));
     _publish(c, KinetixTopics.status(id), 'online', retain: true);
     clients[id] = c;
   }

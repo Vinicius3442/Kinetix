@@ -92,7 +92,8 @@ class _DigitalTwinState extends State<DigitalTwin> with SingleTickerProviderStat
     final nr = approach(_roll, widget.roll), np = approach(_pitch, widget.pitch), ny = approachAngle(_yaw, widget.yaw);
     final nl = approach(_lid, widget.lidOpen ? 1 : 0);
     final ns = math.max(0.0, _shake - dt * 2.2);
-    final moved = (nr - _roll).abs() > 0.01 || (np - _pitch).abs() > 0.01 || (ny - _yaw).abs() > 0.01 || (nl - _lid).abs() > 0.002 || _shake > 0;
+    final moved =
+        (nr - _roll).abs() > 0.01 || (np - _pitch).abs() > 0.01 || (ny - _yaw).abs() > 0.01 || (nl - _lid).abs() > 0.002 || _shake > 0;
     if (moved) {
       setState(() {
         _roll = nr;
@@ -171,8 +172,28 @@ class _TwinPainter extends CustomPainter {
     [4, 5, 7, 6], // +z (frente)
     [0, 2, 3, 1], // -z
   ];
-  static const _normals = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]];
-  static const _edges = [[0, 1], [2, 3], [4, 5], [6, 7], [0, 2], [1, 3], [4, 6], [5, 7], [0, 4], [1, 5], [2, 6], [3, 7]];
+  static const _normals = [
+    [1, 0, 0],
+    [-1, 0, 0],
+    [0, 1, 0],
+    [0, -1, 0],
+    [0, 0, 1],
+    [0, 0, -1]
+  ];
+  static const _edges = [
+    [0, 1],
+    [2, 3],
+    [4, 5],
+    [6, 7],
+    [0, 2],
+    [1, 3],
+    [4, 6],
+    [5, 7],
+    [0, 4],
+    [1, 5],
+    [2, 6],
+    [3, 7]
+  ];
 
   static double _rad(double d) => d * math.pi / 180;
 
@@ -233,7 +254,8 @@ class _TwinPainter extends CustomPainter {
 
     final faces = <({int i, double depth, double shade})>[];
     for (var i = 0; i < 6; i++) {
-      final n = view.transform(model.transform(vm.Vector3(_normals[i][0].toDouble(), _normals[i][1].toDouble(), _normals[i][2].toDouble())));
+      final n =
+          view.transform(model.transform(vm.Vector3(_normals[i][0].toDouble(), _normals[i][1].toDouble(), _normals[i][2].toDouble())));
       // face visível se estiver voltada para a câmera
       final c = _faces[i].map((k) => viewSpace[k]).reduce((a, b) => a + b) / 4.0;
       final toCam = vm.Vector3(0, 0, camDist) - c;
@@ -273,9 +295,13 @@ class _TwinPainter extends CustomPainter {
     for (final e in _edges) {
       final visible = visibleEdges.any((v) => v[0] == math.min(e[0], e[1]) && v[1] == math.max(e[0], e[1]));
       if (!visible) {
-        _dashed(canvas, screen[e[0]], screen[e[1]], Paint()
-          ..color = edgeColor.withValues(alpha: 0.18)
-          ..strokeWidth = 1);
+        _dashed(
+            canvas,
+            screen[e[0]],
+            screen[e[1]],
+            Paint()
+              ..color = edgeColor.withValues(alpha: 0.18)
+              ..strokeWidth = 1);
         continue;
       }
       canvas.drawLine(screen[e[0]], screen[e[1]], glow);
@@ -331,9 +357,12 @@ class _TwinPainter extends CustomPainter {
       canvas.drawPath(arrow, paint);
     }
     final base = pt(-0.78, -0.48), end = pt(-0.16, -0.48);
-    canvas.drawLine(base, end, Paint()
-      ..color = color.withValues(alpha: 0.55)
-      ..strokeWidth = 2);
+    canvas.drawLine(
+        base,
+        end,
+        Paint()
+          ..color = color.withValues(alpha: 0.55)
+          ..strokeWidth = 2);
 
     // etiqueta com QR
     final label = Path()..addPolygon([pt(0.25, 0.42), pt(0.85, 0.42), pt(0.85, -0.42), pt(0.25, -0.42)], true);
@@ -381,10 +410,12 @@ class _TwinPainter extends CustomPainter {
 
     final pts = [lidPt(-hx, -hz), lidPt(hx, -hz), lidPt(hx, hz), lidPt(-hx, hz)].map(project).toList();
     canvas.drawPath(Path()..addPolygon(pts, true), Paint()..color = const Color(0xFF223446));
-    canvas.drawPath(Path()..addPolygon(pts, true), Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.4);
+    canvas.drawPath(
+        Path()..addPolygon(pts, true),
+        Paint()
+          ..color = color
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.4);
   }
 
   void _dashed(Canvas canvas, Offset a, Offset b, Paint p) {
@@ -398,5 +429,12 @@ class _TwinPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _TwinPainter o) =>
-      o.roll != roll || o.pitch != pitch || o.yaw != yaw || o.lid != lid || o.camYaw != camYaw || o.camPitch != camPitch || o.shake != shake || o.alert != alert;
+      o.roll != roll ||
+      o.pitch != pitch ||
+      o.yaw != yaw ||
+      o.lid != lid ||
+      o.camYaw != camYaw ||
+      o.camPitch != camPitch ||
+      o.shake != shake ||
+      o.alert != alert;
 }

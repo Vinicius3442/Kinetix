@@ -77,7 +77,8 @@ class Sparkline extends StatelessWidget {
         borderData: FlBorderData(show: false),
         lineTouchData: const LineTouchData(enabled: false),
         rangeAnnotations: RangeAnnotations(horizontalRangeAnnotations: [
-          if (min != null && max != null) HorizontalRangeAnnotation(y1: min!, y2: max!, color: KxColors.electricLime.withValues(alpha: 0.06)),
+          if (min != null && max != null)
+            HorizontalRangeAnnotation(y1: min!, y2: max!, color: KxColors.electricLime.withValues(alpha: 0.06)),
         ]),
         lineBarsData: [
           LineChartBarData(

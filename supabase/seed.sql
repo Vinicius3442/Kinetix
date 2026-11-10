@@ -17,9 +17,9 @@ insert into public.shipments
 values
   ('TC-8902', 'Vacinas termossensíveis', 'Farmacêutico', 'São José dos Campos-SP', 'Taubaté-SP',
    'kx-01', 'FKT-3B21', 'Hospital Regional de Taubaté', 'em_transito', 15, 30, 80, now() - interval '2 hours', 'demo-tc8902'),
-  ('TC-7741', 'Servidores e placas eletrônicas', 'Eletrônicos', 'Jacareí-SP', 'Caçapava-SP',
+  ('TC-7741', 'Servidores e placas eletrônicas', 'Eletrônicos', 'São José dos Campos-SP', 'Taubaté-SP',
    'kx-02', 'GHT-9A10', 'Data Center Vale', 'em_transito', 10, 35, 70, now() - interval '40 minutes', 'demo-tc7741'),
-  ('TC-6610', 'Lentes ópticas de precisão', 'Óptico', 'Taubaté-SP', 'São Paulo-SP',
+  ('TC-6610', 'Lentes ópticas de precisão', 'Óptico', 'São José dos Campos-SP', 'Taubaté-SP',
    'kx-03', 'BRA-2E19', 'Óptica Paulista', 'preparando', 15, 30, 75, null, 'demo-tc6610')
 on conflict (code) do nothing;
 

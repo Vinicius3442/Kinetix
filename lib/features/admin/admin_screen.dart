@@ -59,6 +59,8 @@ class _ShipmentsTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final async = ref.watch(shipmentsProvider);
     return async.when(
+      skipLoadingOnReload: true,
+      skipError: true,
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => ErrorView(error: e),
       data: (list) => ListView(padding: const EdgeInsets.all(KxSpace.lg), children: [
@@ -69,7 +71,8 @@ class _ShipmentsTab extends ConsumerWidget {
         ]),
         const SizedBox(height: KxSpace.lg),
         if (list.isEmpty)
-          const EmptyState(icon: Icons.inventory_2_outlined, title: 'Nenhuma carga cadastrada', message: 'Use o botão "Nova carga" para começar.')
+          const EmptyState(
+              icon: Icons.inventory_2_outlined, title: 'Nenhuma carga cadastrada', message: 'Use o botão "Nova carga" para começar.')
         else
           for (final s in list) ...[
             KxCard(
@@ -85,7 +88,8 @@ class _ShipmentsTab extends ConsumerWidget {
                         style: KxText.body.copyWith(fontSize: 12), overflow: TextOverflow.ellipsis),
                   ]),
                 ),
-                IconButton(tooltip: 'Editar', icon: const Icon(Icons.edit_outlined), onPressed: () => context.go(Routes.editShipment(s.id))),
+                IconButton(
+                    tooltip: 'Editar', icon: const Icon(Icons.edit_outlined), onPressed: () => context.go(Routes.editShipment(s.id))),
               ]),
             ),
             const SizedBox(height: KxSpace.sm),
@@ -105,6 +109,8 @@ class _DevicesTab extends ConsumerWidget {
     final async = ref.watch(devicesProvider);
     final shipments = ref.watch(shipmentsProvider).value ?? const <Shipment>[];
     return async.when(
+      skipLoadingOnReload: true,
+      skipError: true,
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => ErrorView(error: e),
       data: (devices) => ListView(padding: const EdgeInsets.all(KxSpace.lg), children: [
@@ -117,7 +123,8 @@ class _DevicesTab extends ConsumerWidget {
         ]),
         const SizedBox(height: KxSpace.lg),
         if (devices.isEmpty)
-          const EmptyState(icon: Icons.memory_rounded, title: 'Nenhuma caixa cadastrada', message: 'Cadastre a caixa do Wokwi com o código kx-01.')
+          const EmptyState(
+              icon: Icons.memory_rounded, title: 'Nenhuma caixa cadastrada', message: 'Cadastre a caixa do Wokwi com o código kx-01.')
         else
           for (final d in devices) ...[
             Builder(builder: (context) {
@@ -132,7 +139,10 @@ class _DevicesTab extends ConsumerWidget {
                       Row(children: [
                         Flexible(child: Text(d.name, style: KxText.h3.copyWith(fontSize: 15), overflow: TextOverflow.ellipsis)),
                         const SizedBox(width: KxSpace.sm),
-                        StatusPill(label: d.online ? 'Online' : 'Offline', color: d.online ? KxColors.electricLime : KxColors.textBody, pulse: d.online),
+                        StatusPill(
+                            label: d.online ? 'Online' : 'Offline',
+                            color: d.online ? KxColors.electricLime : KxColors.textBody,
+                            pulse: d.online),
                       ]),
                       Text(
                         '${d.id}${d.battery == null ? '' : ' · bateria ${d.battery}%'}'
@@ -171,7 +181,9 @@ class _DevicesTab extends ConsumerWidget {
         ],
       ),
     );
-    if (ok == true && context.mounted) await runAction(context, () => ref.read(repositoryProvider).deleteDevice(d.id), success: 'Caixa removida.');
+    if (ok == true && context.mounted) {
+      await runAction(context, () => ref.read(repositoryProvider).deleteDevice(d.id), success: 'Caixa removida.');
+    }
   }
 
   Future<void> _editDevice(BuildContext context, WidgetRef ref, [Device? d]) {
@@ -216,6 +228,8 @@ class _UsersTab extends ConsumerWidget {
     final async = ref.watch(profilesProvider);
     final me = ref.watch(sessionProvider).value;
     return async.when(
+      skipLoadingOnReload: true,
+      skipError: true,
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => ErrorView(error: e),
       data: (users) => ListView(padding: const EdgeInsets.all(KxSpace.lg), children: [
@@ -244,7 +258,8 @@ class _UsersTab extends ConsumerWidget {
                 items: [for (final r in UserRole.values) DropdownMenuItem(value: r, child: Text(r.label))],
                 onChanged: (r) => r == null || r == u.role
                     ? null
-                    : runAction(context, () => ref.read(repositoryProvider).setRole(u.id, r), success: '${u.firstName} agora é ${r.label}.'),
+                    : runAction(context, () => ref.read(repositoryProvider).setRole(u.id, r),
+                        success: '${u.firstName} agora é ${r.label}.'),
               ),
             ]),
           ),

@@ -62,8 +62,7 @@ class ScoreEngine {
         : g >= 3.0
             ? (10.0, Severity.warning, 'Impacto forte')
             : (5.0, Severity.warning, 'Impacto leve');
-    out.add(_event(t, EventType.impact, sev, title,
-        'A caixa sofreu um solavanco de ${_fmt(g, 1)} G.', g, penalty));
+    out.add(_event(t, EventType.impact, sev, title, 'A caixa sofreu um solavanco de ${_fmt(g, 1)} G.', g, penalty));
   }
 
   void _tilt(Telemetry t, List<CargoEvent> out) {
@@ -79,8 +78,8 @@ class ScoreEngine {
       }
       if (deg >= 60 && ep.level < 1) {
         ep.level = 1;
-        out.add(_event(t, EventType.tilt, Severity.critical, 'Caixa tombada',
-            'A caixa tombou (${deg.round()}°). Verifique a carga.', deg, 7));
+        out.add(
+            _event(t, EventType.tilt, Severity.critical, 'Caixa tombada', 'A caixa tombou (${deg.round()}°). Verifique a carga.', deg, 7));
       }
     } else if (ep.active && deg < limits.tiltDeg - 5 && _cleared(ep, t, clearAfter)) {
       ep.active = false;
@@ -122,10 +121,7 @@ class ScoreEngine {
         out.add(_event(t, EventType.temperature, Severity.critical, 'Temperatura crítica',
             'A carga está muito $word: ${_fmt(temp, 1)} °C (faixa segura $range).', temp, 5));
       }
-    } else if (ep.active &&
-        temp <= limits.tempMax - 0.5 &&
-        temp >= limits.tempMin + 0.5 &&
-        _cleared(ep, t, tempClearAfter)) {
+    } else if (ep.active && temp <= limits.tempMax - 0.5 && temp >= limits.tempMin + 0.5 && _cleared(ep, t, tempClearAfter)) {
       ep.active = false;
     }
   }

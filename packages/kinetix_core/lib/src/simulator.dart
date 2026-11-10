@@ -17,19 +17,21 @@ enum SimIncident { impact, tilt, opening, heat, signalLoss }
 class TelemetrySimulator {
   TelemetrySimulator({
     required this.deviceId,
-    this.route = DemoRoute.dutra,
-    this.tripSeconds = 900,
+    DemoRoute? route,
+    this.tripSeconds = 1800,
     this.scripted = true,
     this.baseTemp = 22,
     int seed = 7,
     DateTime? start,
-  })  : _rnd = math.Random(seed),
+  })  : route = route ?? DemoRoute.dutra,
+        _rnd = math.Random(seed),
         _clock = (start ?? DateTime.now()).toUtc();
 
   final String deviceId;
   final DemoRoute route;
 
-  /// Duração de uma viagem completa da origem ao destino, em segundos.
+  /// Duração da viagem da origem ao destino, em segundos (padrão: 30 min,
+  /// ~83 km/h nos 41,5 km da Dutra). Ao chegar, o caminhão fica parado no destino.
   final int tripSeconds;
 
   /// Se `true`, roda o roteiro automático de ocorrências.
@@ -50,6 +52,16 @@ class TelemetrySimulator {
   bool _pendingImpact = false;
 
   int get elapsed => _t;
+
+  /// `false` = caminhão parado na origem (carga ainda não saiu).
+  bool driving = true;
+  int _tripStart = 0;
+
+  /// Começa a viagem agora, a partir da origem.
+  void startTrip() {
+    driving = true;
+    _tripStart = _t;
+  }
 
   void trigger(SimIncident i) {
     switch (i) {
@@ -106,9 +118,8 @@ class TelemetrySimulator {
     _temp += (target - _temp) * 0.12 + _noise(0.05);
     final hum = 52 + math.sin(_t / 37) * 4 + _noise(0.5);
 
-    // posição na rota (vai e volta)
-    final lap = (_t % (tripSeconds * 2)) / tripSeconds;
-    final f = lap <= 1 ? lap : 2 - lap;
+    // posição na estrada: avança até o destino e para lá
+    final f = driving ? math.min(1.0, (_t - _tripStart) / tripSeconds) : 0.0;
     final (lat, lng) = route.at(f);
     final yaw = route.headingAt(f) + _noise(0.6);
 

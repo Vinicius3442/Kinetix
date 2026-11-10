@@ -12,8 +12,7 @@ enum EventType {
   final String code;
   final String label;
 
-  static EventType fromCode(String? code) =>
-      EventType.values.firstWhere((e) => e.code == code, orElse: () => EventType.connection);
+  static EventType fromCode(String? code) => EventType.values.firstWhere((e) => e.code == code, orElse: () => EventType.connection);
 }
 
 enum Severity {
@@ -24,8 +23,7 @@ enum Severity {
   const Severity(this.code);
   final String code;
 
-  static Severity fromCode(String? code) =>
-      Severity.values.firstWhere((e) => e.code == code, orElse: () => Severity.info);
+  static Severity fromCode(String? code) => Severity.values.firstWhere((e) => e.code == code, orElse: () => Severity.info);
 }
 
 /// Uma ocorrência na viagem da carga, já com texto pronto para o usuário.
@@ -126,8 +124,7 @@ class CargoEvent {
         'buffered': buffered,
       };
 
-  CargoEvent copyWith({int? id, String? shipmentId, double? scoreAfter, DateTime? acknowledgedAt, String? acknowledgedBy}) =>
-      CargoEvent(
+  CargoEvent copyWith({int? id, String? shipmentId, double? scoreAfter, DateTime? acknowledgedAt, String? acknowledgedBy}) => CargoEvent(
         id: id ?? this.id,
         shipmentId: shipmentId ?? this.shipmentId,
         deviceId: deviceId,

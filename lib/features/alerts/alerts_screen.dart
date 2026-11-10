@@ -26,6 +26,8 @@ class AlertsScreen extends ConsumerWidget {
         child: ContentWidth(
           max: 820,
           child: async.when(
+            skipLoadingOnReload: true,
+            skipError: true,
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (e, _) => ErrorView(error: e, onRetry: () => ref.invalidate(alertsProvider)),
             data: (alerts) => ListView(padding: const EdgeInsets.all(KxSpace.lg), children: [

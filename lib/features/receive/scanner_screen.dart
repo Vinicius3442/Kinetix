@@ -104,7 +104,8 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
                       child: Column(mainAxisSize: MainAxisSize.min, children: [
                         const Icon(Icons.qr_code_scanner_rounded, size: 64, color: KxColors.cyberCyan),
                         const SizedBox(height: KxSpace.lg),
-                        FilledButton.icon(onPressed: _startCamera, icon: const Icon(Icons.photo_camera_outlined), label: const Text('Abrir câmera')),
+                        FilledButton.icon(
+                            onPressed: _startCamera, icon: const Icon(Icons.photo_camera_outlined), label: const Text('Abrir câmera')),
                       ]),
                     ),
             ),
@@ -129,7 +130,8 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
           const SizedBox(height: KxSpace.xl),
           const SectionTitle('Modo demonstração: simular leitura de'),
           Wrap(spacing: KxSpace.sm, runSpacing: KxSpace.sm, children: [
-            for (final s in samples) ActionChip(avatar: const Icon(Icons.qr_code_2_rounded, size: 18), label: Text(s.code), onPressed: () => _open(s.qrToken)),
+            for (final s in samples)
+              ActionChip(avatar: const Icon(Icons.qr_code_2_rounded, size: 18), label: Text(s.code), onPressed: () => _open(s.qrToken)),
           ]),
         ],
       ]),

@@ -1,9 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:latlong2/latlong.dart';
 
 import '../../core/router/app_router.dart';
 import '../../core/theme/app_theme.dart';
@@ -12,6 +10,7 @@ import '../../core/utils/format.dart';
 import '../../core/widgets/kx_widgets.dart';
 import '../../data/models/models.dart';
 import '../../data/providers.dart';
+import '../map/cargo_map.dart';
 import '../shell/app_shell.dart';
 import '../twin/digital_twin.dart';
 import 'event_tile.dart';
@@ -47,7 +46,18 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
     final buffered = readings.where((r) => r.buffered).length;
     final wide = MediaQuery.sizeOf(context).width >= 980;
 
-    final map = _RouteMap(readings: readings, events: events);
+    final map = KxCard(
+      padding: const EdgeInsets.all(KxSpace.md),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const SectionTitle('Trajeto (GPS)'),
+        CargoMap(
+          trail: readings,
+          events: events,
+          height: 300,
+          onEventTap: s == null ? null : (e) => showEventSheet(context, ref, s, e),
+        ),
+      ]),
+    );
     final chart = s == null ? const SizedBox.shrink() : _TempChart(readings: readings, limits: s.limits);
     final timeline = KxCard(
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -132,87 +142,6 @@ class _BufferCard extends StatelessWidget {
       );
 }
 
-class _RouteMap extends StatelessWidget {
-  const _RouteMap({required this.readings, required this.events});
-  final List<Telemetry> readings;
-  final List<CargoEvent> events;
-
-  @override
-  Widget build(BuildContext context) {
-    final pts = readings.where((r) => r.hasLocation).map((r) => LatLng(r.lat!, r.lng!)).toList();
-    final evs = events.where((e) => e.lat != null && e.lng != null).toList();
-    final all = [...pts, ...evs.map((e) => LatLng(e.lat!, e.lng!))];
-    return KxCard(
-      padding: const EdgeInsets.all(KxSpace.md),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const SectionTitle('Trajeto (GPS)'),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(KxRadius.input),
-          child: SizedBox(
-            height: 260,
-            child: all.isEmpty
-                ? Center(child: Text('Sem posições registradas ainda.', style: KxText.body))
-                : FlutterMap(
-                    options: MapOptions(
-                      initialCameraFit: all.length == 1
-                          ? null
-                          : CameraFit.bounds(bounds: LatLngBounds.fromPoints(all), padding: const EdgeInsets.all(36)),
-                      initialCenter: all.first,
-                      initialZoom: 12,
-                      backgroundColor: KxColors.charcoalSolid,
-                      interactionOptions: const InteractionOptions(flags: InteractiveFlag.all & ~InteractiveFlag.rotate),
-                    ),
-                    children: [
-                      TileLayer(
-                        urlTemplate: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-                        subdomains: const ['a', 'b', 'c', 'd'],
-                        userAgentPackageName: 'br.senai.talpa.kinetix',
-                        retinaMode: RetinaMode.isHighDensity(context),
-                      ),
-                      if (pts.length > 1)
-                        PolylineLayer(polylines: [Polyline(points: pts, color: KxColors.cyberCyan, strokeWidth: 3)]),
-                      MarkerLayer(markers: [
-                        if (pts.isNotEmpty)
-                          Marker(point: pts.first, width: 14, height: 14, child: const _Dot(color: KxColors.textDisplay)),
-                        if (pts.isNotEmpty)
-                          Marker(point: pts.last, width: 26, height: 26, child: const Icon(Icons.local_shipping_rounded, color: KxColors.cyberCyan, size: 22)),
-                        for (final e in evs)
-                          Marker(
-                            point: LatLng(e.lat!, e.lng!),
-                            width: 26,
-                            height: 26,
-                            child: Tooltip(
-                              message: '${Fmt.hm(e.ts)} · ${e.title}',
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: KxColors.obsidianPitch,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: KxColors.forSeverity(e.severity), width: 2),
-                                ),
-                                child: Icon(eventIcon(e.type), size: 14, color: KxColors.forSeverity(e.severity)),
-                              ),
-                            ),
-                          ),
-                      ]),
-                      const SimpleAttributionWidget(source: Text('OpenStreetMap · CARTO')),
-                    ],
-                  ),
-          ),
-        ),
-      ]),
-    );
-  }
-}
-
-class _Dot extends StatelessWidget {
-  const _Dot({required this.color});
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) =>
-      Container(decoration: BoxDecoration(color: color, shape: BoxShape.circle, border: Border.all(color: KxColors.obsidianPitch, width: 2)));
-}
-
 class _TempChart extends StatelessWidget {
   const _TempChart({required this.readings, required this.limits});
   final List<Telemetry> readings;
@@ -257,7 +186,8 @@ class _TempChart extends StatelessWidget {
                   showTitles: true,
                   reservedSize: 22,
                   interval: ((x(rs.last) / 4).ceilToDouble()).clamp(1, 1e9),
-                  getTitlesWidget: (v, m) => Text(Fmt.hm(t0.add(Duration(seconds: (v * 60).round()))), style: KxText.log.copyWith(fontSize: 10)),
+                  getTitlesWidget: (v, m) =>
+                      Text(Fmt.hm(t0.add(Duration(seconds: (v * 60).round()))), style: KxText.log.copyWith(fontSize: 10)),
                 ),
               ),
             ),
@@ -349,7 +279,8 @@ Future<void> showEventSheet(BuildContext context, WidgetRef ref, Shipment s, Car
               width: double.infinity,
               child: FilledButton.icon(
                 onPressed: () async {
-                  final ok = await runAction(ctx, () => ref.read(repositoryProvider).acknowledge(e.id!), success: 'Ocorrência marcada como vista.');
+                  final ok = await runAction(ctx, () => ref.read(repositoryProvider).acknowledge(e.id!),
+                      success: 'Ocorrência marcada como vista.');
                   if (ok && ctx.mounted) Navigator.pop(ctx);
                 },
                 icon: const Icon(Icons.done_all_rounded),

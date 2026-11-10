@@ -337,7 +337,7 @@ revoke execute on function public.acknowledge_event(bigint) from anon;
 do $$
 declare t text;
 begin
-  foreach t in array array['shipments', 'events', 'devices', 'readings'] loop
+  foreach t in array array['shipments', 'events', 'devices', 'readings', 'profiles'] loop
     begin
       execute format('alter publication supabase_realtime add table public.%I', t);
     exception when duplicate_object then null;

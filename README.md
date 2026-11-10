@@ -38,6 +38,7 @@ Na tela de login, toque em **Gestor logístico**, **Administrador** ou **Motoris
 1. Crie um projeto grátis em [supabase.com](https://supabase.com).
 2. Vá em **SQL Editor**, cole todo o arquivo [`supabase/migrations/20261110000000_kinetix_schema.sql`](supabase/migrations/20261110000000_kinetix_schema.sql) e clique em **Run**.
 3. Faça o mesmo com [`supabase/seed.sql`](supabase/seed.sql). Ele cria as caixas `kx-01`, `kx-02` e `kx-03` e cargas de exemplo.
+   - **Já tinha rodado o schema antes de 11/11?** Rode também [`supabase/migrations/20261111000000_realtime_profiles.sql`](supabase/migrations/20261111000000_realtime_profiles.sql). Ele corrige a tela **Gestão → Usuários**, que ficava piscando.
 4. Para testar sem confirmar e-mail: **Authentication → Sign In / Providers → Email**, desligue **Confirm email**.
 5. Em **Project Settings → API**, copie:
    - **Project URL** e **anon/publishable key**, que vão para o app;
@@ -173,7 +174,7 @@ flutter test
 
 ## Limitações conhecidas
 
-- **GPS simulado**: o Wokwi não tem módulo GPS, então a posição percorre a Via Dutra (SJC → Taubaté).
+- **GPS simulado**: o Wokwi não tem módulo GPS. O firmware e o simulador percorrem o **traçado real da Via Dutra** (SJC → Taubaté, 41,5 km, tirado do OpenStreetMap) em 30 minutos e param no destino. O mapa do app usa OpenStreetMap/CARTO, que não precisam de chave de API.
 - **Broker público** (`broker.hivemq.com`): qualquer pessoa que souber o tópico pode ler os dados. Para algo privado, crie um cluster grátis no HiveMQ Cloud e ajuste `MQTT_*` no firmware, na ponte e no app.
 - **Alertas** aparecem dentro do app (banner e aba Alertas). Notificação push com o app fechado ainda não foi feita.
 - O serviço ponte precisa ficar rodando num computador (ou num serviço como Render/Railway) para gravar no banco.

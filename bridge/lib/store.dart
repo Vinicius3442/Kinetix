@@ -103,16 +103,14 @@ class SupabaseStore implements BridgeStore {
   @override
   Future<void> insertReadings(List<Map<String, dynamic>> rows) async {
     if (rows.isEmpty) return;
-    await _check(_http.post(Uri.parse('$base/readings'),
-        headers: {..._h, 'Prefer': 'return=minimal'}, body: jsonEncode(rows)));
+    await _check(_http.post(Uri.parse('$base/readings'), headers: {..._h, 'Prefer': 'return=minimal'}, body: jsonEncode(rows)));
   }
 
   @override
   Future<List<CargoEvent>> insertEvents(List<CargoEvent> events) async {
     if (events.isEmpty) return const [];
     final r = await _check(_http.post(Uri.parse('$base/events'),
-        headers: {..._h, 'Prefer': 'return=representation'},
-        body: jsonEncode(events.map((e) => e.toJson()).toList())));
+        headers: {..._h, 'Prefer': 'return=representation'}, body: jsonEncode(events.map((e) => e.toJson()).toList())));
     return (jsonDecode(r.body) as List).map((e) => CargoEvent.fromJson(e as Map<String, dynamic>)).toList();
   }
 

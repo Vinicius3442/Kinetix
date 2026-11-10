@@ -97,9 +97,7 @@ class _AppShellState extends ConsumerState<AppShell> {
 
     Widget icon(_Dest d, bool sel) {
       final i = Icon(sel ? d.selectedIcon : d.icon);
-      return d.branch == 1 && alertCount > 0
-          ? Badge(label: Text('$alertCount'), backgroundColor: KxColors.talpaLava, child: i)
-          : i;
+      return d.branch == 1 && alertCount > 0 ? Badge(label: Text('$alertCount'), backgroundColor: KxColors.talpaLava, child: i) : i;
     }
 
     final body = Column(children: [

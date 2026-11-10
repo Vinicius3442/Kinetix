@@ -3,8 +3,7 @@ import 'package:test/test.dart';
 
 final t0 = DateTime.utc(2026, 11, 10, 14, 0, 0);
 
-Telemetry reading(int sec,
-        {double roll = 0, double pitch = 0, double peak = 1, double light = 2, double temp = 22, double hum = 50}) =>
+Telemetry reading(int sec, {double roll = 0, double pitch = 0, double peak = 1, double light = 2, double temp = 22, double hum = 50}) =>
     Telemetry(
       deviceId: 'kx-01',
       ts: t0.add(Duration(seconds: sec)),
@@ -17,6 +16,7 @@ Telemetry reading(int sec,
     );
 
 void main() {
+  routeTests();
   group('ScoreEngine', () {
     test('viagem tranquila mantém 100', () {
       final e = ScoreEngine();
@@ -167,6 +167,40 @@ void main() {
       expect(e.score, 100);
       sim.trigger(SimIncident.opening);
       expect(e.process(sim.next()).single.type, EventType.opening);
+    });
+  });
+}
+
+void routeTests() {
+  group('Rota real (Via Dutra)', () {
+    final r = DemoRoute.dutra;
+
+    test('tem cerca de 41 km e começa/termina nas cidades certas', () {
+      expect(r.totalKm, inInclusiveRange(40, 43));
+      expect(r.nearest(r.path.first.$1, r.path.first.$2), 'São José dos Campos-SP');
+      expect(r.nearest(r.path.last.$1, r.path.last.$2), 'Taubaté-SP');
+    });
+
+    test('posição e progresso batem', () {
+      final (lat, lng) = r.at(0.5);
+      final p = r.progressOf(lat, lng);
+      expect(p.fraction, closeTo(0.5, 0.01));
+      expect(p.offRouteMeters, lessThan(5));
+      expect(p.remainingKm, closeTo(r.totalKm / 2, 0.5));
+    });
+
+    test('ponto longe da estrada é detectado', () {
+      expect(r.progressOf(-22.9, -47.06).offRouteMeters, greaterThan(50000)); // Campinas
+    });
+
+    test('simulador anda pela estrada e para no destino', () {
+      final sim = TelemetrySimulator(deviceId: 'kx', tripSeconds: 100, start: DateTime.utc(2026));
+      Telemetry? last;
+      for (var i = 0; i < 150; i++) {
+        last = sim.next();
+        expect(r.progressOf(last.lat!, last.lng!).offRouteMeters, lessThan(5));
+      }
+      expect(r.progressOf(last!.lat!, last.lng!).fraction, closeTo(1, 0.001));
     });
   });
 }

@@ -63,6 +63,8 @@ class _ShipmentsScreenState extends ConsumerState<ShipmentsScreen> {
           : null,
       body: SafeArea(
         child: async.when(
+          skipLoadingOnReload: true,
+          skipError: true,
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (e, _) => ErrorView(error: e, onRetry: () => ref.invalidate(shipmentsProvider)),
           data: (all) {
@@ -129,7 +131,10 @@ class _ShipmentsScreenState extends ConsumerState<ShipmentsScreen> {
                               : 'Quando um gestor colocar você como motorista de uma carga, ela aparece aqui.'
                           : 'Nenhuma carga combina com a busca ou o filtro escolhido.',
                       action: all.isEmpty && (me?.role.isStaff ?? false)
-                          ? FilledButton.icon(onPressed: () => context.go(Routes.newShipment), icon: const Icon(Icons.add), label: const Text('Cadastrar carga'))
+                          ? FilledButton.icon(
+                              onPressed: () => context.go(Routes.newShipment),
+                              icon: const Icon(Icons.add),
+                              label: const Text('Cadastrar carga'))
                           : (all.isNotEmpty
                               ? OutlinedButton(onPressed: () => setState(() => _filter = _Filter.all), child: const Text('Ver todas'))
                               : null),
@@ -202,9 +207,8 @@ class ShipmentCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final s = shipment;
     final color = KxColors.forIntegrity(s.integrity);
-    final device = s.deviceId == null
-        ? null
-        : (ref.watch(devicesProvider).value ?? const <Device>[]).where((d) => d.id == s.deviceId).firstOrNull;
+    final device =
+        s.deviceId == null ? null : (ref.watch(devicesProvider).value ?? const <Device>[]).where((d) => d.id == s.deviceId).firstOrNull;
 
     final statusLine = switch (s.status) {
       ShipmentStatus.inTransit => device?.online ?? false
@@ -232,7 +236,10 @@ class ShipmentCard extends ConsumerWidget {
               Wrap(spacing: KxSpace.sm, runSpacing: 4, crossAxisAlignment: WrapCrossAlignment.center, children: [
                 Text(s.code, style: KxText.log.copyWith(color: KxColors.cyberCyan, fontSize: 13)),
                 if (openAlerts > 0)
-                  StatusPill(label: '$openAlerts ${openAlerts == 1 ? 'alerta' : 'alertas'}', color: KxColors.talpaLava, icon: Icons.notifications_active_outlined),
+                  StatusPill(
+                      label: '$openAlerts ${openAlerts == 1 ? 'alerta' : 'alertas'}',
+                      color: KxColors.talpaLava,
+                      icon: Icons.notifications_active_outlined),
               ]),
               const SizedBox(height: 4),
               Text(s.description, style: KxText.h3, maxLines: 1, overflow: TextOverflow.ellipsis),
@@ -252,7 +259,9 @@ class ShipmentCard extends ConsumerWidget {
                 else
                   Icon(Icons.circle, size: 8, color: statusColor),
                 const SizedBox(width: 6),
-                Expanded(child: Text(statusLine, style: KxText.body.copyWith(color: statusColor, fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                Expanded(
+                    child: Text(statusLine,
+                        style: KxText.body.copyWith(color: statusColor, fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis)),
               ]),
             ]),
           ),

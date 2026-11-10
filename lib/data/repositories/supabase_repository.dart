@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/models.dart';
 import '../services/mqtt_live.dart';
+import '../services/resilient_stream.dart';
 import 'kinetix_repository.dart';
 
 /// Implementação real: Supabase (banco, login, tempo real) + MQTT ao vivo.
@@ -79,8 +80,7 @@ class SupabaseRepository extends KinetixRepository {
   }
 
   @override
-  Future<void> signIn(String email, String password) =>
-      _guard(() => db.auth.signInWithPassword(email: email.trim(), password: password));
+  Future<void> signIn(String email, String password) => _guard(() => db.auth.signInWithPassword(email: email.trim(), password: password));
 
   @override
   Future<void> signUp(String name, String email, String password) => _guard(() async {
@@ -100,7 +100,9 @@ class SupabaseRepository extends KinetixRepository {
 
   @override
   Future<void> updateMyProfile({required String fullName, String? phone, String? company}) => _guard(() async {
-        await db.from('profiles').update({'full_name': fullName.trim(), 'phone': phone, 'company': company}).eq('id', db.auth.currentUser!.id);
+        await db
+            .from('profiles')
+            .update({'full_name': fullName.trim(), 'phone': phone, 'company': company}).eq('id', db.auth.currentUser!.id);
         await _refreshSession();
       });
 
@@ -113,11 +115,8 @@ class SupabaseRepository extends KinetixRepository {
   // ======================================================================= cargas
 
   @override
-  Stream<List<Shipment>> watchShipments() => db
-      .from('shipments')
-      .stream(primaryKey: ['id'])
-      .order('created_at')
-      .map((rows) => rows.map(Shipment.fromJson).toList());
+  Stream<List<Shipment>> watchShipments() => resilientStream(
+      () => db.from('shipments').stream(primaryKey: ['id']).order('created_at').map((rows) => rows.map(Shipment.fromJson).toList()));
 
   @override
   Future<Shipment> createShipment(ShipmentDraft d) => _guard(() async {
@@ -137,23 +136,20 @@ class SupabaseRepository extends KinetixRepository {
   // ======================================================================= ocorrências
 
   @override
-  Stream<List<CargoEvent>> watchEvents(String shipmentId) => db
+  Stream<List<CargoEvent>> watchEvents(String shipmentId) => resilientStream(() => db
       .from('events')
       .stream(primaryKey: ['id'])
       .eq('shipment_id', shipmentId)
       .order('ts')
-      .map((rows) => rows.map(CargoEvent.fromJson).toList());
+      .map((rows) => rows.map(CargoEvent.fromJson).toList()));
 
   @override
-  Stream<List<CargoEvent>> watchAlerts() => db
+  Stream<List<CargoEvent>> watchAlerts() => resilientStream(() => db
       .from('events')
       .stream(primaryKey: ['id'])
       .order('ts')
       .limit(200)
-      .map((rows) => rows
-          .map(CargoEvent.fromJson)
-          .where((e) => !e.isAcknowledged && e.severity != Severity.info)
-          .toList());
+      .map((rows) => rows.map(CargoEvent.fromJson).where((e) => !e.isAcknowledged && e.severity != Severity.info).toList()));
 
   @override
   Future<void> acknowledge(int eventId) => _guard(() => db.rpc('acknowledge_event', params: {'eid': eventId}));
@@ -167,8 +163,8 @@ class SupabaseRepository extends KinetixRepository {
   // ======================================================================= caixas
 
   @override
-  Stream<List<Device>> watchDevices() =>
-      db.from('devices').stream(primaryKey: ['id']).order('id', ascending: true).map((rows) => rows.map(Device.fromJson).toList());
+  Stream<List<Device>> watchDevices() => resilientStream(
+      () => db.from('devices').stream(primaryKey: ['id']).order('id', ascending: true).map((rows) => rows.map(Device.fromJson).toList()));
 
   @override
   Future<void> saveDevice(String id, String name) => _guard(() async {
@@ -183,13 +179,13 @@ class SupabaseRepository extends KinetixRepository {
   @override
   Stream<Telemetry> liveTelemetry(String deviceId) {
     // MQTT ao vivo + última leitura gravada no banco (se o MQTT não conectar)
-    final fromDb = db
+    final fromDb = resilientStream(() => db
         .from('devices')
         .stream(primaryKey: ['id'])
         .eq('id', deviceId)
         .map((rows) => rows.isEmpty ? null : Device.fromJson(rows.first).lastTelemetry)
         .where((t) => t != null)
-        .cast<Telemetry>();
+        .cast<Telemetry>());
     final ctrl = StreamController<Telemetry>();
     DateTime? lastMqtt;
     final subs = <StreamSubscription>[
@@ -212,8 +208,11 @@ class SupabaseRepository extends KinetixRepository {
   // ======================================================================= usuários
 
   @override
-  Stream<List<Profile>> watchProfiles() =>
-      db.from('profiles').stream(primaryKey: ['id']).order('full_name', ascending: true).map((rows) => rows.map(Profile.fromJson).toList());
+  Stream<List<Profile>> watchProfiles() => resilientStream(() => db
+      .from('profiles')
+      .stream(primaryKey: ['id'])
+      .order('full_name', ascending: true)
+      .map((rows) => rows.map(Profile.fromJson).toList()));
 
   @override
   Future<void> setRole(String userId, UserRole role) =>
