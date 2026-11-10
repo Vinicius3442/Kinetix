@@ -47,11 +47,30 @@ class SupabaseStore implements BridgeStore {
   final String serviceKey;
   final http.Client _http;
 
+  // Chaves novas (sb_secret_...) vão só no apikey; as antigas (JWT) também no Authorization.
   Map<String, String> get _h => {
         'apikey': serviceKey,
-        'Authorization': 'Bearer $serviceKey',
+        if (!serviceKey.startsWith('sb_')) 'Authorization': 'Bearer $serviceKey',
         'Content-Type': 'application/json',
       };
+
+  /// Confere se a chave é a secreta (service_role). Devolve a mensagem de erro, ou `null` se estiver certa.
+  static String? checkServiceKey(String key) {
+    const help = 'Use a chave SECRETA: Supabase → Project Settings → API Keys → "secret" (sb_secret_...) '
+        'ou, na aba "Legacy API Keys", a "service_role". A chave anon/publishable é a do app, não a da ponte.';
+    if (key.startsWith('sb_publishable_')) return 'SUPABASE_SERVICE_KEY está com a chave PÚBLICA (sb_publishable_...).\n$help';
+    if (key.startsWith('sb_secret_')) return null;
+    final parts = key.split('.');
+    if (parts.length != 3) return 'SUPABASE_SERVICE_KEY não parece uma chave do Supabase.\n$help';
+    try {
+      final payload = jsonDecode(utf8.decode(base64Url.decode(base64Url.normalize(parts[1])))) as Map<String, dynamic>;
+      final role = payload['role'];
+      if (role != 'service_role') return 'SUPABASE_SERVICE_KEY está com a chave "$role" (pública).\n$help';
+    } catch (_) {
+      return 'SUPABASE_SERVICE_KEY não parece uma chave do Supabase.\n$help';
+    }
+    return null;
+  }
 
   Future<http.Response> _check(Future<http.Response> f) async {
     final r = await f;

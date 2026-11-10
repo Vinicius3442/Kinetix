@@ -14,7 +14,13 @@ import 'package:mqtt_client/mqtt_client.dart';
 
 Future<void> main() async {
   final env = Env.load();
-  final store = SupabaseStore(env.require('SUPABASE_URL'), env.require('SUPABASE_SERVICE_KEY'));
+  final key = env.require('SUPABASE_SERVICE_KEY');
+  final keyProblem = SupabaseStore.checkServiceKey(key);
+  if (keyProblem != null) {
+    stderr.writeln('[CONFIG] $keyProblem');
+    exit(78);
+  }
+  final store = SupabaseStore(env.require('SUPABASE_URL'), key);
   final client = await connectMqtt(env, clientId: 'kinetix-bridge-${DateTime.now().millisecondsSinceEpoch}');
 
   void publishScore(String deviceId, double score) {

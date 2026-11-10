@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:kinetix_bridge/processor.dart';
 import 'package:kinetix_bridge/store.dart';
 import 'package:kinetix_core/kinetix_core.dart';
@@ -32,6 +34,7 @@ Telemetry tel(int s, {double light = 1, bool buffered = false}) =>
     Telemetry(deviceId: 'kx-01', ts: t0.add(Duration(seconds: s)), light: light, temp: 22, hum: 50, buffered: buffered);
 
 void main() {
+  keyTests();
   late FakeStore store;
   late TelemetryProcessor p;
   var clock = t0;
@@ -85,5 +88,20 @@ void main() {
     await p.handleStatus('kx-01', 'offline');
     expect(store.devices['kx-01']!['status'], 'offline');
     expect(store.events.single.title, 'Caixa sem sinal');
+  });
+}
+
+String _jwt(String role) {
+  String b(Map<String, dynamic> m) => base64Url.encode(utf8.encode(jsonEncode(m))).replaceAll('=', '');
+  return '${b({'alg': 'HS256'})}.${b({'role': role})}.assinatura';
+}
+
+void keyTests() {
+  test('aceita só a chave secreta', () {
+    expect(SupabaseStore.checkServiceKey(_jwt('service_role')), isNull);
+    expect(SupabaseStore.checkServiceKey('sb_secret_abc'), isNull);
+    expect(SupabaseStore.checkServiceKey(_jwt('anon')), contains('"anon"'));
+    expect(SupabaseStore.checkServiceKey('sb_publishable_abc'), contains('PÚBLICA'));
+    expect(SupabaseStore.checkServiceKey('qualquer-coisa'), isNotNull);
   });
 }
