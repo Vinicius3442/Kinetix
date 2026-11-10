@@ -55,6 +55,12 @@ Siga o guia [`firmware/kinetix-esp32/README.md`](firmware/kinetix-esp32/README.m
 cd bridge && cp .env.example .env
 ```
 
+Na primeira vez, baixe as dependências da ponte. Sem isso, o Dart usa as do app Flutter da pasta de cima e dá o erro `Couldn't resolve the package 'kinetix_bridge'`:
+
+```bash
+dart pub get
+```
+
 Preencha o `.env` com `SUPABASE_URL` e `SUPABASE_SERVICE_KEY` e rode:
 
 ```bash
