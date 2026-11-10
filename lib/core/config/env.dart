@@ -21,6 +21,11 @@ class Env {
   /// usa o endereço em que o app está aberto.
   static const appUrl = String.fromEnvironment('APP_URL');
 
+  /// Mapa de fundo. Padrão: OpenStreetMap (grátis, sem chave), escurecido pelo app.
+  /// Para outro provedor, passe a URL com {z}/{x}/{y} (e a chave, se ele exigir).
+  static const mapTilesUrl = String.fromEnvironment('MAP_TILES_URL', defaultValue: osmTiles);
+  static const osmTiles = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+
   static const forceDemo = bool.fromEnvironment('DEMO');
 
   static bool get isDemo => forceDemo || supabaseUrl.isEmpty || supabaseAnonKey.isEmpty;

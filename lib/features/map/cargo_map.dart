@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../../core/config/env.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/utils/format.dart';
@@ -165,10 +166,10 @@ class _CargoMapState extends State<CargoMap> with SingleTickerProviderStateMixin
             ),
             children: [
               TileLayer(
-                urlTemplate: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-                subdomains: const ['a', 'b', 'c', 'd'],
+                urlTemplate: Env.mapTilesUrl,
                 userAgentPackageName: 'br.senai.talpa.kinetix',
-                retinaMode: RetinaMode.isHighDensity(context),
+                maxNativeZoom: 19,
+                tileBuilder: Env.mapTilesUrl == Env.osmTiles ? _darkTiles : null,
               ),
               if (planned.length > 1)
                 PolylineLayer(polylines: [
@@ -217,7 +218,7 @@ class _CargoMapState extends State<CargoMap> with SingleTickerProviderStateMixin
                     child: _Truck(heading: _heading, live: widget.live),
                   ),
               ]),
-              const SimpleAttributionWidget(source: Text('OpenStreetMap · CARTO')),
+              const SimpleAttributionWidget(source: Text('colaboradores do OpenStreetMap')),
             ],
           ),
           Positioned(
@@ -251,6 +252,18 @@ class _CargoMapState extends State<CargoMap> with SingleTickerProviderStateMixin
     );
   }
 }
+
+/// Deixa o mapa claro do OpenStreetMap escuro, no tom azul-obsidiana do app:
+/// tira a cor, inverte o brilho (ruas claras sobre fundo escuro) e tinge de azul.
+const _darkMatrix = <double>[
+  -0.0638, -0.2146, -0.0217, 0, 84.0, //
+  -0.0723, -0.2432, -0.0245, 0, 98.7,
+  -0.0893, -0.3004, -0.0303, 0, 127.1,
+  0, 0, 0, 1, 0,
+];
+
+Widget _darkTiles(BuildContext context, Widget tile, TileImage image) =>
+    ColorFiltered(colorFilter: const ColorFilter.matrix(_darkMatrix), child: tile);
 
 /// Barra de progresso da viagem: quanto já andou, quanto falta e onde está.
 class TripProgress extends StatelessWidget {

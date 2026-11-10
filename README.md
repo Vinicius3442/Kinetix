@@ -174,7 +174,7 @@ flutter test
 
 ## Limitações conhecidas
 
-- **GPS simulado**: o Wokwi não tem módulo GPS. O firmware e o simulador percorrem o **traçado real da Via Dutra** (SJC → Taubaté, 41,5 km, tirado do OpenStreetMap) em 30 minutos e param no destino. O mapa do app usa OpenStreetMap/CARTO, que não precisam de chave de API.
+- **GPS simulado**: o Wokwi não tem módulo GPS. O firmware e o simulador percorrem o **traçado real da Via Dutra** (SJC → Taubaté, 41,5 km, tirado do OpenStreetMap) em 30 minutos e param no destino. O mapa de fundo é o do OpenStreetMap (sem chave de API), escurecido pelo app. Para trocar de provedor, passe `MAP_TILES_URL` no `config.json`.
 - **Broker público** (`broker.hivemq.com`): qualquer pessoa que souber o tópico pode ler os dados. Para algo privado, crie um cluster grátis no HiveMQ Cloud e ajuste `MQTT_*` no firmware, na ponte e no app.
 - **Alertas** aparecem dentro do app (banner e aba Alertas). Notificação push com o app fechado ainda não foi feita.
 - O serviço ponte precisa ficar rodando num computador (ou num serviço como Render/Railway) para gravar no banco.
