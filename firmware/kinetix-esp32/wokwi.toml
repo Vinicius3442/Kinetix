@@ -1,0 +1,5 @@
+# Para usar com a extensão Wokwi do VS Code (opcional)
+[wokwi]
+version = 1
+firmware = ".pio/build/esp32/firmware.bin"
+elf = ".pio/build/esp32/firmware.elf"

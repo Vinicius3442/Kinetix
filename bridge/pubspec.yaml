@@ -1,0 +1,17 @@
+name: kinetix_bridge
+description: Serviço ponte MQTT → Supabase do Kinetix (substitui a Wegnology) e simulador de caixas.
+version: 1.0.0
+publish_to: none
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+
+dependencies:
+  kinetix_core:
+    path: ../packages/kinetix_core
+  mqtt_client: ^10.5.0
+  http: ^1.2.0
+
+dev_dependencies:
+  test: ^1.25.0
+  lints: ^4.0.0
